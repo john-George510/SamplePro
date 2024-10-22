@@ -1,0 +1,159 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 98DA-45D6
+E:.
+¦   tree.txt
+¦   
++---backend
+¦   ¦   .babelrc
+¦   ¦   .env
+¦   ¦   package-lock.json
+¦   ¦   package.json
+¦   ¦   
+¦   +---logs
+¦   ¦       combined.log
+¦   ¦       error.log
+¦   ¦       
+¦   +---src
+¦   ¦   ¦   app.js
+¦   ¦   ¦   server.js
+¦   ¦   ¦   
+¦   ¦   +---config
+¦   ¦   ¦       db.js
+¦   ¦   ¦       redis.js
+¦   ¦   ¦       
+¦   ¦   +---controllers
+¦   ¦   ¦       adminController.js
+¦   ¦   ¦       analyticsController.js
+¦   ¦   ¦       authController.js
+¦   ¦   ¦       bookingController.js
+¦   ¦   ¦       driverController.js
+¦   ¦   ¦       fleetController.js
+¦   ¦   ¦       
+¦   ¦   +---middleware
+¦   ¦   ¦       authMiddleware.js
+¦   ¦   ¦       cacheMiddleware.js
+¦   ¦   ¦       rateLimiter.js
+¦   ¦   ¦       
+¦   ¦   +---models
+¦   ¦   ¦       Booking.js
+¦   ¦   ¦       Driver.js
+¦   ¦   ¦       Tracking.js
+¦   ¦   ¦       User.js
+¦   ¦   ¦       Vehicle.js
+¦   ¦   ¦       
+¦   ¦   +---routes
+¦   ¦   ¦       adminRoutes.js
+¦   ¦   ¦       analyticsRoutes.js
+¦   ¦   ¦       authRoutes.js
+¦   ¦   ¦       bookingRoutes.js
+¦   ¦   ¦       bookings.js
+¦   ¦   ¦       driverRoutes.js
+¦   ¦   ¦       fleetRoutes.js
+¦   ¦   ¦       
+¦   ¦   +---services
+¦   ¦   ¦       matchingService.js
+¦   ¦   ¦       notificationService.js
+¦   ¦   ¦       pricingService.js
+¦   ¦   ¦       
+¦   ¦   +---sockets
+¦   ¦   ¦       socketHandler.js
+¦   ¦   ¦       
+¦   ¦   +---utils
+¦   ¦   ¦       calculateDistance.js
+¦   ¦   ¦       calculatePrice.js
+¦   ¦   ¦       errorHandler.js
+¦   ¦   ¦       geolocation.js
+¦   ¦   ¦       logger.js
+¦   ¦   ¦       validator.js
+¦   ¦   ¦       
+¦   ¦   +---workers
+¦   ¦           demandMonitor.js
+¦   ¦           
+¦   +---tests
++---frontend
+    ¦   .env
+    ¦   .eslintrc.js
+    ¦   .gitignore
+    ¦   .prettierrc
+    ¦   package-lock.json
+    ¦   package.json
+    ¦   README.md
+    ¦   
+    +---public
+    ¦       favicon.ico
+    ¦       index.html
+    ¦       logo192.png
+    ¦       logo512.png
+    ¦       manifest.json
+    ¦       robots.txt
+    ¦       
+    +---src
+    ¦   ¦   App.css
+    ¦   ¦   App.js
+    ¦   ¦   App.test.js
+    ¦   ¦   index.css
+    ¦   ¦   index.js
+    ¦   ¦   logo.svg
+    ¦   ¦   reportWebVitals.js
+    ¦   ¦   setupTests.js
+    ¦   ¦   
+    ¦   +---assets
+    ¦   ¦   +---styles
+    ¦   ¦           global.css
+    ¦   ¦           
+    ¦   +---components
+    ¦   ¦   +---Admin
+    ¦   ¦   ¦       AdminAnalytics.jsx
+    ¦   ¦   ¦       AdminBookings.jsx
+    ¦   ¦   ¦       FleetManagement.jsx
+    ¦   ¦   ¦       
+    ¦   ¦   +---Booking
+    ¦   ¦   ¦       BookingCard.jsx
+    ¦   ¦   ¦       BookingForm.jsx
+    ¦   ¦   ¦       BookingList.jsx
+    ¦   ¦   ¦       
+    ¦   ¦   +---common
+    ¦   ¦   ¦       Button.jsx
+    ¦   ¦   ¦       Input.jsx
+    ¦   ¦   ¦       MapPicker.jsx
+    ¦   ¦   ¦       Modal.jsx
+    ¦   ¦   ¦       PrivateRoute.jsx
+    ¦   ¦   ¦       TrackingMap.jsx
+    ¦   ¦   ¦       
+    ¦   ¦   +---Driver
+    ¦   ¦   ¦       DriverAssignments.jsx
+    ¦   ¦   ¦       DriverMap.jsx
+    ¦   ¦   ¦       
+    ¦   ¦   +---Tracking
+    ¦   ¦           TrackingMap.jsx
+    ¦   ¦           
+    ¦   +---pages
+    ¦   ¦       Dashboard.jsx
+    ¦   ¦       Home.jsx
+    ¦   ¦       Login.jsx
+    ¦   ¦       NotFound.jsx
+    ¦   ¦       Register.jsx
+    ¦   ¦       
+    ¦   +---redux
+    ¦   ¦   ¦   store.js
+    ¦   ¦   ¦   
+    ¦   ¦   +---slices
+    ¦   ¦           analyticsSlice.js
+    ¦   ¦           bookingSlice.js
+    ¦   ¦           driverSlice.js
+    ¦   ¦           fleetSlice.js
+    ¦   ¦           userSlice.js
+    ¦   ¦           
+    ¦   +---services
+    ¦   ¦       analyticsService.js
+    ¦   ¦       api.js
+    ¦   ¦       authService.js
+    ¦   ¦       bookingService.js
+    ¦   ¦       driverService.js
+    ¦   ¦       fleetService.js
+    ¦   ¦       socket.js
+    ¦   ¦       
+    ¦   +---utils
+    ¦           pricingModel.js
+    ¦           
+    +---tests

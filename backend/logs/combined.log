@@ -1,0 +1,17 @@
+{"level":"info","message":"Connected to Redis","service":"logistics-service","timestamp":"2024-10-20T14:14:49.191Z"}
+{"level":"error","message":"MongoDB Connection Error: getaddrinfo ENOTFOUND mongo","reason":{"commonWireVersion":0,"compatible":true,"heartbeatFrequencyMS":10000,"localThresholdMS":15,"logicalSessionTimeoutMinutes":null,"maxElectionId":null,"maxSetVersion":null,"servers":{"mongo:27017":{"$clusterTime":null,"address":"mongo:27017","arbiters":[],"electionId":null,"error":{},"hosts":[],"lastUpdateTime":336357807,"lastWriteDate":0,"logicalSessionTimeoutMinutes":null,"maxWireVersion":0,"me":null,"minRoundTripTime":0,"minWireVersion":0,"passives":[],"primary":null,"roundTripTime":-1,"setName":null,"setVersion":null,"tags":{},"topologyVersion":null,"type":"Unknown"}},"setName":null,"stale":false,"type":"Unknown"},"service":"logistics-service","stack":"MongooseServerSelectionError: getaddrinfo ENOTFOUND mongo\n    at _handleConnectionErrors (E:\\Projects\\atlan internship\\backend\\node_modules\\mongoose\\lib\\connection.js:909:11)\n    at NativeConnection.openUri (E:\\Projects\\atlan internship\\backend\\node_modules\\mongoose\\lib\\connection.js:860:11)\n    at async connectDB (E:\\Projects\\atlan internship\\backend\\src\\config\\db.js:9:5)","timestamp":"2024-10-20T14:15:19.177Z"}
+{"level":"info","message":"Connected to Redis","service":"logistics-service","timestamp":"2024-10-20T14:16:40.815Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:16:40.837Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:19:55.555Z"}
+{"level":"info","message":"Connected to Redis","service":"logistics-service","timestamp":"2024-10-20T14:20:16.385Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:20:16.401Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:20:51.853Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:21:38.133Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:22:08.937Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:31:44.135Z"}
+{"level":"info","message":"Connected to Redis","service":"logistics-service","timestamp":"2024-10-20T14:33:48.235Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-20T14:33:48.257Z"}
+{"level":"info","message":"Connected to Redis","service":"logistics-service","timestamp":"2024-10-21T11:42:37.080Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-21T11:42:37.098Z"}
+{"level":"info","message":"Connected to Redis","service":"logistics-service","timestamp":"2024-10-21T11:43:14.141Z"}
+{"level":"info","message":"MongoDB Connected","service":"logistics-service","timestamp":"2024-10-21T11:43:14.161Z"}
