@@ -7,18 +7,23 @@ const getBasePrice = (vehicleType) => {
     return rates[vehicleType] || 1.0;
   };
   
-  const calculateDistance = (pickup, dropoff) => {
+  calculateDistance = (pickup, dropoff) => {
     // Simplified calculation using Euclidean distance
-    const dx = dropoff.latitude - pickup.latitude;
-    const dy = dropoff.longitude - pickup.longitude;
-    return Math.sqrt(dx * dx + dy * dy) * 111; // Approximate conversion to kilometers
+    const r = 6371; // km
+    const p = Math.PI / 180;
+
+    const a = 0.5 - Math.cos((dropoff.latitude - pickup.latitude) * p) / 2
+                  + Math.cos(pickup.latitude * p) * Math.cos(dropoff.latitude * p) *
+                    (1 - Math.cos((dropoff.longitude - pickup.longitude) * p)) / 2;
+
+    return 2 * r * Math.asin(Math.sqrt(a)); // Approximate conversion to kilometers
   };
   
   exports.estimatePrice = async (pickupLocation, dropoffLocation, vehicleType) => {
     const distance = calculateDistance(pickupLocation, dropoffLocation);
     const basePrice = getBasePrice(vehicleType);
-  
+    
     const price = basePrice * distance;
-    return price;
+    return { price, distance };
   };
   

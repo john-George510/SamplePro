@@ -36,13 +36,13 @@ const BookingCard = ({ booking }) => {
       </p>
       <p>
         <strong>Pickup:</strong>{' '}
-        {getCoordinate(booking.pickupLocation?.latitude)},{' '}
-        {getCoordinate(booking.pickupLocation?.longitude)}
+        {getCoordinate(booking.pickupLocation?.coordinates[1])},{' '}
+        {getCoordinate(booking.pickupLocation?.coordinates[0])}
       </p>
       <p>
         <strong>Dropoff:</strong>{' '}
-        {getCoordinate(booking.dropoffLocation?.latitude)},{' '}
-        {getCoordinate(booking.dropoffLocation?.longitude)}
+        {getCoordinate(booking.dropoffLocation?.coordinates[1])},{' '}
+        {getCoordinate(booking.dropoffLocation?.coordinates[0])}
       </p>
       <p>
         <strong>Vehicle Type:</strong> {booking.vehicleType}

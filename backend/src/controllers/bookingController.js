@@ -8,35 +8,37 @@ exports.createBooking = async (req, res) => {
   try {
     const { pickupLocation, dropoffLocation, vehicleType } = req.body;
     const userId = req.user.id; // Corrected access
-
+    console.log(req.user);  
     // Validate input
     if (
       !pickupLocation ||
       !dropoffLocation ||
-      typeof pickupLocation.latitude !== 'number' ||
-      typeof pickupLocation.longitude !== 'number' ||
-      typeof dropoffLocation.latitude !== 'number' ||
-      typeof dropoffLocation.longitude !== 'number' ||
+      // typeof pickupLocation.latitude !== 'number' ||
+      // typeof pickupLocation.longitude !== 'number' ||
+      // typeof dropoffLocation.latitude !== 'number' ||
+      // typeof dropoffLocation.longitude !== 'number' ||
       !vehicleType
     ) {
       return res.status(400).json({ msg: 'All fields are required and must be valid.' });
     }
 
-    const estimatedCost = await pricingService.estimatePrice(pickupLocation, dropoffLocation, vehicleType);
+    const pickupCoordinates = { latitude: pickupLocation.coordinates[1], longitude: pickupLocation.coordinates[0] };
 
+    const dropoffCoordinates = { latitude: dropoffLocation.coordinates[1], longitude: dropoffLocation.coordinates[0] };
+    
+    const { price, distance } = await pricingService.estimatePrice(pickupCoordinates, dropoffCoordinates, vehicleType);
+
+    // console.log(estimatedCost, distance);
     const booking = new Booking({
-      user: userId,
-      pickupLocation: {
-        type: 'Point',
-        coordinates: [pickupLocation.longitude, pickupLocation.latitude],
-      },
-      dropoffLocation: {
-        type: 'Point',
-        coordinates: [dropoffLocation.longitude, dropoffLocation.latitude],
-      },
+      user: req.user.userId,
+      pickupLocation: pickupLocation,
+      dropoffLocation: dropoffLocation,
       vehicleType,
-      estimatedCost,
+      price,
+      distance: distance,
     });
+
+    console.log(booking);
 
     await booking.save();
 

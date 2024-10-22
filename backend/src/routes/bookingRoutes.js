@@ -15,7 +15,9 @@ router.get('/', authMiddleware, getUserBookings);
 // List all bookings (orders)
 router.get('/all', authMiddleware, async (req, res) => {
   try {
-    const bookings = await Booking.find({}).populate('user', 'name email').populate('driver', 'name email');
+    const { latitude, longitude } = req.query;
+    const bookings = await Booking.find({})
+    console.log(bookings);
     res.json(bookings);
   } catch (error) {
     console.error('Error fetching all bookings:', error);
