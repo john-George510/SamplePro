@@ -33,7 +33,7 @@ const Dashboard = () => {
           (error) => {
             console.error('Error getting location:', error);
             // Optionally, display an error message to the driver
-          },
+          }
         );
       } else {
         console.error('Geolocation is not supported by this browser.');
@@ -50,7 +50,11 @@ const Dashboard = () => {
       <div style={{ padding: '20px' }}>
         <h2>User Dashboard</h2>
         <BookingForm />
-        <BookingList bookings={bookings} />
+        {bookings.length > 0 ? (
+          <BookingList bookings={bookings} />
+        ) : (
+          <p>No bookings found.</p>
+        )}
       </div>
     );
   } else if (userRole === 'admin') {

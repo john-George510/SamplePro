@@ -4,7 +4,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { acceptBooking } from '../../redux/slices/bookingSlice';
 
-const BookingCard = ({ booking }) => {
+const BookingCard = ({ booking, showAcceptButton }) => {
   const dispatch = useDispatch();
 
   const handleAccept = () => {
@@ -58,9 +58,8 @@ const BookingCard = ({ booking }) => {
       <p>
         <strong>Status:</strong> {booking.status}
       </p>
-      {booking.status === 'Pending' && (
+      {showAcceptButton && booking.status === 'Pending' && (
         <button
-          onClick={handleAccept}
           style={{
             padding: '8px 12px',
             cursor: 'pointer',
