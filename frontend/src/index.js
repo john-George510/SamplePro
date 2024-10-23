@@ -5,12 +5,16 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import store from './redux/store';
 import App from './App';
 import './index.css';
+import { SocketProvider } from './context/SocketContext';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <Router>
-      <App />
-    </Router>
+    <SocketProvider>
+      <Router>
+        <App />
+      </Router>
+    </SocketProvider>
   </Provider>
 );

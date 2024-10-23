@@ -20,7 +20,8 @@ export const fetchUserBookings = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       };
-      const { data } = await axios.get('/bookings', config);
+      const { data } = await axios.get('/bookings/all', config);
+      console.log(data);
       return data;
     } catch (error) {
       return rejectWithValue(

@@ -3,17 +3,23 @@
 import React from 'react';
 import BookingCard from './BookingCard';
 import { useSelector, useDispatch } from 'react-redux';
+import { jwtDecode } from 'jwt-decode';
 
-const BookingList = ({ bookings }) => {
+const BookingList = ({ bookings, onTrack }) => {
   const user = useSelector((state) => state.user);
   const role = user.role;
-  console.log(role, user);
+
+  const decodedToken = jwtDecode(user.token); // Decode the JWT
+  const userId = decodedToken.userId;
+
+  console.log('userId', typeof userId);
   if (!bookings || bookings.length === 0) return <p>No bookings available.</p>;
-  console.log(bookings);
+  console.log('bookings', bookings);
+
   const filteredBookings =
     role === 'driver'
       ? bookings // Show all bookings for drivers
-      : bookings.filter((booking) => booking.user._id === user._id);
+      : bookings.filter((booking) => booking.user === userId);
   return (
     <div>
       <h3>Bookings</h3>
@@ -23,6 +29,7 @@ const BookingList = ({ bookings }) => {
             key={booking._id}
             booking={booking}
             showAcceptButton={role === 'driver'} // Show accept button only for drivers
+            onTrack={onTrack}
           />
         ))
       ) : (

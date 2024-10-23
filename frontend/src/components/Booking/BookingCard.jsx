@@ -1,26 +1,40 @@
 // frontend/src/components/Booking/BookingCard.jsx
 
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { acceptBooking } from '../../redux/slices/bookingSlice';
+import { SocketContext } from '../../context/SocketContext';
+import TrackModal from './TrackModal';
 
-const BookingCard = ({ booking, showAcceptButton }) => {
+const BookingCard = ({ booking, showAcceptButton, onTrack }) => {
   const dispatch = useDispatch();
+  const [isTracking, setIsTracking] = useState(false);
+  const socket = useContext(SocketContext);
+  const handleTrack = () => {
+    setIsTracking(true);
+    // Join the booking room for real-time updates
+    socket.emit('joinBookingRoom', { bookingId: booking._id });
+  };
 
+  const handleCloseTrack = () => {
+    setIsTracking(false);
+    // Optionally, leave the booking room
+    socket.emit('leaveBookingRoom', { bookingId: booking._id });
+  };
   const handleAccept = () => {
-    dispatch(acceptBooking(booking._id))
-      .unwrap()
-      .then(() => {
-        alert('Booking accepted successfully!');
-      })
-      .catch((err) => {
-        alert(`Error accepting booking: ${err}`);
-      });
+    dispatch(acceptBooking(booking._id));
+    socket.emit('joinBookingRoom', { bookingId: booking._id });
   };
 
   const getCoordinate = (coordinate) =>
     coordinate ? coordinate.toFixed(4) : 'N/A';
 
+  const handleStatusUpdate = (status) => {
+    // Emit status update via Socket.IO
+    socket.emit('driverStatusUpdate', { bookingId: booking._id, status });
+    console.log(`Booking ${booking._id} status updated to: ${status}`);
+    // Optionally, update the booking status in Redux state
+  };
   return (
     <div
       style={{
@@ -68,12 +82,78 @@ const BookingCard = ({ booking, showAcceptButton }) => {
             border: 'none',
             borderRadius: '4px',
           }}
+          onClick={handleAccept}
         >
           Accept Booking
         </button>
       )}
+
+      {onTrack && booking.driver && (
+        <button onClick={handleTrack} style={styles.trackButton}>
+          Track Driver
+        </button>
+      )}
+
+      {showAcceptButton && booking.status === 'Assigned' && (
+        <div style={styles.statusButtons}>
+          <button
+            onClick={() => handleStatusUpdate('On the way')}
+            style={styles.statusButton}
+          >
+            On the way
+          </button>
+          <button
+            onClick={() => handleStatusUpdate('Arrived')}
+            style={styles.statusButton}
+          >
+            Arrived
+          </button>
+        </div>
+      )}
+
+      {isTracking && (
+        <TrackModal bookingId={booking._id} onClose={handleCloseTrack} />
+      )}
     </div>
   );
+};
+
+const styles = {
+  card: {
+    border: '1px solid #ddd',
+    padding: '15px',
+    marginBottom: '10px',
+    borderRadius: '8px',
+  },
+  acceptButton: {
+    padding: '8px 12px',
+    cursor: 'pointer',
+    backgroundColor: '#28a745',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    marginRight: '10px',
+  },
+  trackButton: {
+    padding: '8px 12px',
+    cursor: 'pointer',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+  },
+  statusButtons: {
+    marginTop: '10px',
+  },
+  statusButton: {
+    padding: '6px 10px',
+    cursor: 'pointer',
+    backgroundColor: '#ffc107',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    marginRight: '5px',
+  },
 };
 
 export default BookingCard;

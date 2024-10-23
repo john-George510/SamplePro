@@ -8,7 +8,7 @@ exports.createBooking = async (req, res) => {
   try {
     const { pickupLocation, dropoffLocation, vehicleType } = req.body;
     const userId = req.user.id; // Corrected access
-    console.log(req.user);  
+    // console.log(req.user);  
     // Validate input
     if (
       !pickupLocation ||
@@ -27,7 +27,7 @@ exports.createBooking = async (req, res) => {
     const dropoffCoordinates = { latitude: dropoffLocation.coordinates[1], longitude: dropoffLocation.coordinates[0] };
     
     const { price, distance } = await pricingService.estimatePrice(pickupCoordinates, dropoffCoordinates, vehicleType);
-
+    console.log(price, distance);
     // console.log(estimatedCost, distance);
     const booking = new Booking({
       user: req.user.userId,
