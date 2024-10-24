@@ -4,6 +4,7 @@
   "description": "Backend for Logistics Platform",
   "main": "server.js",
   "scripts": {
+    "build": "webpack --config=Scripts/config/webpack.prod.js",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
@@ -13,6 +14,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
+    "mongodb": "^6.10.0",
     "mongoose": "^7.0.4",
     "react-map-gl-geocoder": "^2.2.0",
     "redis": "^4.6.5",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
+    "webpack-cli": "^5.1.4",
     "worker-loader": "^3.0.8"
   },
   "directories": {
