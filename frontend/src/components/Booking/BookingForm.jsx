@@ -1,7 +1,6 @@
 // src/components/Booking/BookingForm.jsx
 
 import React, { useState, useEffect } from 'react';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { createBooking } from '../../redux/slices/bookingSlice';
 import MapPicker from '../common/MapPicker';
@@ -69,50 +68,50 @@ const BookingForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Create a Booking</h3>
-      <div style={{ marginBottom: '20px' }}>
-        <h4>Pickup Location</h4>
-        {pickupLocation ? (
+    <div className="booking-form-container">
+      <form onSubmit={handleSubmit}>
+        <h3>Create a Booking</h3>
+        <div className="form-group">
+          <h4>Pickup Location</h4>
+          {pickupLocation ? (
+            <MapPicker
+              label="Pickup Location"
+              onSelectLocation={setPickupLocation}
+              initialLocation={pickupLocation}
+            />
+          ) : (
+            <p>Loading pickup location...</p>
+          )}
+        </div>
+        <div className="form-group">
+          <h4>Dropoff Location</h4>
           <MapPicker
-            label="Pickup Location"
-            onSelectLocation={setPickupLocation}
-            initialLocation={pickupLocation}
+            label="Dropoff Location"
+            onSelectLocation={setDropoffLocation}
+            initialLocation={dropoffLocation}
           />
-        ) : (
-          <p>Loading pickup location...</p>
+        </div>
+        <div className="form-group">
+          <label htmlFor="vehicleType">Vehicle Type:</label>
+          <select
+            id="vehicleType"
+            value={vehicleType}
+            onChange={(e) => setVehicleType(e.target.value)}
+          >
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+        <button type="submit">Create Booking</button>
+        {bookingStatus === 'failed' && (
+          <p className="error-message">{bookingError}</p>
         )}
-      </div>
-      <div style={{ marginBottom: '20px' }}>
-        <h4>Dropoff Location</h4>
-        <MapPicker
-          label="Dropoff Location"
-          onSelectLocation={setDropoffLocation}
-          initialLocation={dropoffLocation}
-        />
-      </div>
-      <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="vehicleType">Vehicle Type:</label>
-        <select
-          id="vehicleType"
-          value={vehicleType}
-          onChange={(e) => setVehicleType(e.target.value)}
-        >
-          <option value="small">Small</option>
-          <option value="medium">Medium</option>
-          <option value="large">Large</option>
-        </select>
-      </div>
-      <button type="submit" disabled={bookingStatus === 'loading'}>
-        {bookingStatus === 'loading' ? 'Creating...' : 'Create Booking'}
-      </button>
-      {bookingStatus === 'failed' && (
-        <p style={{ color: 'red' }}>{bookingError}</p>
-      )}
-      {bookingStatus === 'succeeded' && (
-        <p style={{ color: 'green' }}>Booking created successfully!</p>
-      )}
-    </form>
+        {bookingStatus === 'succeeded' && (
+          <p className="success-message">Booking created successfully!</p>
+        )}
+      </form>
+    </div>
   );
 };
 

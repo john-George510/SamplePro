@@ -1,6 +1,6 @@
 // src/components/common/MapPicker.jsx
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
@@ -12,31 +12,27 @@ const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
 const MapPicker = ({ label, onSelectLocation, initialLocation }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-
-  const [marker, setMarker] = useState(initialLocation || null);
-  const [viewport, setViewport] = useState({
-    latitude: initialLocation ? initialLocation.latitude : 40.7128, // Default to NYC
-    longitude: initialLocation ? initialLocation.longitude : -74.006,
-    zoom: 12,
-  });
+  const markerRef = useRef(null);
 
   useEffect(() => {
     if (!MAPBOX_TOKEN) {
       console.error(
-        'Mapbox token is not set. Please add it to your .env file.',
+        'Mapbox token is not set. Please add it to your .env file.'
       );
       return;
     }
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+
     // Initialize Mapbox map
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [viewport.longitude, viewport.latitude],
-      zoom: viewport.zoom,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: initialLocation
+        ? [initialLocation.longitude, initialLocation.latitude]
+        : [-74.006, 40.7128], // Default to NYC if no initialLocation
+      zoom: 12,
     });
 
-    // Add navigation control (the +/- zoom buttons)
+    // Add navigation controls (zoom buttons)
     mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // Initialize Geocoder
@@ -54,25 +50,24 @@ const MapPicker = ({ label, onSelectLocation, initialLocation }) => {
     geocoder.on('result', (e) => {
       const [longitude, latitude] = e.result.center;
 
-      // Remove existing markers
-      const existingMarkers = document.querySelectorAll('.marker');
-      existingMarkers.forEach((marker) => marker.remove());
+      // Update marker position
+      if (markerRef.current) {
+        markerRef.current.setLngLat([longitude, latitude]);
+      } else {
+        markerRef.current = new mapboxgl.Marker({ color: 'blue' })
+          .setLngLat([longitude, latitude])
+          .addTo(mapRef.current);
+      }
 
-      // Add a new marker
-      new mapboxgl.Marker({ color: 'blue' })
-        .setLngLat([longitude, latitude])
-        .addTo(mapRef.current);
-
-      // Fly to the selected location
+      // Center the map on the selected location
       mapRef.current.flyTo({
         center: [longitude, latitude],
-        zoom: 14,
-        speed: 2,
-        curve: 1.42,
+        essential: true,
+        speed: 1.2, // Adjust speed for smoother transition
+        zoom: 14, // Optional: Adjust zoom level if needed
       });
 
-      // Update state
-      setMarker({ latitude, longitude });
+      // Notify parent component
       onSelectLocation({ latitude, longitude });
     });
 
@@ -80,24 +75,31 @@ const MapPicker = ({ label, onSelectLocation, initialLocation }) => {
     mapRef.current.on('click', (e) => {
       const { lng, lat } = e.lngLat;
 
-      // Remove existing markers
-      const existingMarkers = document.querySelectorAll('.marker');
-      existingMarkers.forEach((marker) => marker.remove());
+      // Update marker position
+      if (markerRef.current) {
+        markerRef.current.setLngLat([lng, lat]);
+      } else {
+        markerRef.current = new mapboxgl.Marker({ color: 'red' })
+          .setLngLat([lng, lat])
+          .addTo(mapRef.current);
+      }
 
-      // Add a new marker
-      new mapboxgl.Marker({ color: 'red' })
-        .setLngLat([lng, lat])
-        .addTo(mapRef.current);
+      // Center the map on the clicked location
+      mapRef.current.flyTo({
+        center: [lng, lat],
+        essential: true,
+        speed: 1.2, // Adjust speed for smoother transition
+        zoom: 14, // Optional: Adjust zoom level if needed
+      });
 
-      // Update state
-      setMarker({ latitude: lat, longitude: lng });
+      // Notify parent component
       onSelectLocation({ latitude: lat, longitude: lng });
     });
 
-    // Add initial marker if exists
-    if (marker) {
-      new mapboxgl.Marker({ color: 'green' })
-        .setLngLat([marker.longitude, marker.latitude])
+    // Add initial marker if initialLocation exists
+    if (initialLocation) {
+      markerRef.current = new mapboxgl.Marker({ color: 'green' })
+        .setLngLat([initialLocation.longitude, initialLocation.latitude])
         .addTo(mapRef.current);
     }
 
@@ -105,15 +107,30 @@ const MapPicker = ({ label, onSelectLocation, initialLocation }) => {
     return () => {
       mapRef.current.remove();
     };
-  }, [
-    MAPBOX_TOKEN,
-    initialLocation,
-    onSelectLocation,
-    marker,
-    viewport.latitude,
-    viewport.longitude,
-    viewport.zoom,
-  ]);
+  }, [MAPBOX_TOKEN]); // Run only once on mount
+
+  useEffect(() => {
+    if (initialLocation && mapRef.current) {
+      const { latitude, longitude } = initialLocation;
+
+      // Update or create marker
+      if (markerRef.current) {
+        markerRef.current.setLngLat([longitude, latitude]);
+      } else {
+        markerRef.current = new mapboxgl.Marker({ color: 'green' })
+          .setLngLat([longitude, latitude])
+          .addTo(mapRef.current);
+      }
+
+      // Center the map on the initial location
+      mapRef.current.flyTo({
+        center: [longitude, latitude],
+        essential: true,
+        speed: 1.2,
+        zoom: 14,
+      });
+    }
+  }, [initialLocation]); // Update when initialLocation prop changes
 
   return (
     <div style={{ marginBottom: '20px' }}>

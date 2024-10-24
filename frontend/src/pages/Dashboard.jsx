@@ -1,6 +1,8 @@
+// src/pages/Dashboard.jsx
+
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Corrected import
 import throttle from 'lodash/throttle';
 import BookingForm from '../components/Booking/BookingForm';
 import BookingList from '../components/Booking/BookingList';
@@ -11,6 +13,7 @@ import {
   fetchNearbyBookings,
 } from '../redux/slices/bookingSlice';
 import { SocketContext } from '../context/SocketContext';
+import { useNavigate } from 'react-router-dom'; // Added import for navigate
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -24,10 +27,26 @@ const Dashboard = () => {
   const [isTracking, setIsTracking] = useState(false); // To toggle tracking
   const lastLocation = useRef(null); // Store the last known location
 
-  const decodedToken = jwtDecode(user.token);
-  const userId = decodedToken.userId || decodedToken.id;
+  const navigate = useNavigate(); // Initialize navigate
+
+  let decodedToken = null;
+  let userId = null;
+  if (user.token) {
+    try {
+      decodedToken = jwtDecode(user.token); // Corrected usage
+      userId = decodedToken.userId || decodedToken.id;
+      console.log('Decoded user ID:', userId);
+    } catch (error) {
+      console.error('Invalid token:', error);
+    }
+  }
+
   const joinedRooms = useRef(new Set());
-  console.log('Decoded user ID:', userId);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('token'); // Remove token from local storage
+    navigate('/login'); // Redirect to login page
+  };
 
   // Throttle function to send location updates at intervals
   const emitThrottledLocation = throttle((bookingId, latitude, longitude) => {
@@ -140,30 +159,27 @@ const Dashboard = () => {
     }
   };
 
-  const getDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the Earth in km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c * 1000; // Distance in meters
-  };
-
   if (userRole === 'user') {
     return (
-      <div style={{ padding: '20px' }}>
-        <h2>User Dashboard</h2>
-        <BookingForm />
-        {bookings.length > 0 ? (
-          <BookingList bookings={bookings} onTrack={handleTrack} />
-        ) : (
-          <p>No bookings found.</p>
-        )}
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <h2>User Dashboard</h2>
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
+        </div>
+        <div className="dashboard-flex">
+          <div className="booking-form-wrapper">
+            <BookingForm />
+          </div>
+          <div className="booking-list-wrapper">
+            {bookings.length > 0 ? (
+              <BookingList bookings={bookings} onTrack={handleTrack} />
+            ) : (
+              <p>No bookings found.</p>
+            )}
+          </div>
+        </div>
         {trackingBookingId && (
           <TrackModal
             bookingId={trackingBookingId}
@@ -174,17 +190,27 @@ const Dashboard = () => {
     );
   } else if (userRole === 'admin') {
     return (
-      <div style={{ padding: '20px' }}>
-        <h2>Admin Dashboard</h2>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <h2>Admin Dashboard</h2>
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
+        </div>
         <FleetManagement />
       </div>
     );
   } else if (userRole === 'driver') {
     return (
-      <div style={{ padding: '20px' }}>
-        <h2>Driver Dashboard</h2>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <h2>Driver Dashboard</h2>
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
+        </div>
         {driverLocation ? (
-          <BookingList bookings={bookings} />
+          <BookingList bookings={bookings} driverLocation={driverLocation} />
         ) : (
           <p>Fetching your location...</p>
         )}

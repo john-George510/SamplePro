@@ -1,38 +1,329 @@
-.App {
-  text-align: center;
+/* App.css */
+
+/* Apply a full-cover gradient background to the entire application */
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: 200% 200%; /* Ensures the gradient covers the viewport */
+  /* Optional: Add a subtle animation for a dynamic background */
+  animation: gradientShift 10s ease infinite;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Gradient Animation (Optional) */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Common container style with glassmorphism for specific components */
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  margin: 40px auto; /* Center the container horizontally with margin */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* Heading styles */
+h1, h2, h3, h4 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 300;
+  color: #fff;
+}
+
+/* Link styles */
+a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Form input styles */
+form {
   display: flex;
   flex-direction: column;
-  align-items: center;
+}
+
+input, select {
+  padding: 12px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+input::placeholder {
+  color: #ddd;
+}
+
+button {
+  padding: 12px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #6a11cb; /* Solid color for better button visibility */
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #2575fc;
+  transform: translateY(-2px);
+}
+
+/* Logout Button */
+.logout-button {
+  padding: 8px 16px;
+  background-color: #dc3545; /* Red for logout */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+/* Link container */
+.link-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Booking Components Styles */
+
+/* Booking Form Container */
+.booking-form-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 600px;
+  width: 90%;
+  margin: 20px auto; /* Center horizontally */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* Booking List Container */
+.booking-list-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 800px;
+  width: 90%;
+  margin: 20px auto; /* Center horizontally */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* Booking Card Styles */
+.booking-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Booking Card Buttons */
+.booking-card button {
+  padding: 8px 12px;
+  cursor: pointer;
+  background-color: #28a745; /* Green for accept */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin-right: 10px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.booking-card button:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.booking-card .track-button {
+  background-color: #007bff; /* Blue for track */
+}
+
+.booking-card .track-button:hover {
+  background-color: #0069d9;
+  transform: translateY(-2px);
+}
+
+.booking-card .status-button {
+  background-color: #ffc107; /* Yellow for status update */
+}
+
+.booking-card .status-button:hover {
+  background-color: #e0a800;
+  transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  z-index: 1000;
 }
 
-.App-link {
-  color: #61dafb;
+.modal-content {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  animation: fadeIn 0.3s ease;
 }
 
-@keyframes App-logo-spin {
+.modal-content h2 {
+  margin-top: 0;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(-20px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto; /* Center the dashboard horizontally */
+  color: #fff;
+  min-height: 100vh; /* Ensure it takes full viewport height */
+  box-sizing: border-box;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+}
+
+.logout-button {
+  padding: 8px 16px;
+  background-color: #dc3545; /* Red for logout */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+/* Flex Layout for Booking Form and List */
+.dashboard-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.booking-form-wrapper,
+.booking-list-wrapper {
+  flex: 1 1 45%; /* Adjust width based on available space */
+  min-width: 300px;
+}
+
+/* Adjust Booking List for full width on smaller screens */
+@media (max-width: 768px) {
+  .booking-form-wrapper,
+  .booking-list-wrapper {
+    flex: 1 1 100%;
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .booking-form-container, .booking-list-container {
+    max-width: 100%;
+  }
+
+  .dashboard-flex {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .container, .booking-form-container, .booking-list-container, .dashboard-container {
+    padding: 20px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 10px;
   }
 }

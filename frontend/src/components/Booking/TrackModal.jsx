@@ -1,9 +1,12 @@
+// src/components/common/TrackModal.jsx
+
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { SocketContext } from '../../context/SocketContext';
 import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox CSS
 
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN; // Replace with your Mapbox token
+// Set your Mapbox access token
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN; // Replace with your Mapbox token
 
 const TrackModal = ({ bookingId, onClose }) => {
   const mapContainerRef = useRef(null);
@@ -14,6 +17,9 @@ const TrackModal = ({ bookingId, onClose }) => {
   const [status, setStatus] = useState('');
 
   useEffect(() => {
+    // Initialize Mapbox map only once
+    if (mapRef.current) return; // Prevent multiple map instances
+
     // Initialize Mapbox map
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
@@ -21,6 +27,9 @@ const TrackModal = ({ bookingId, onClose }) => {
       center: [0, 0], // Temporary center; will update once location is received
       zoom: 12,
     });
+
+    // Add navigation controls (zoom buttons)
+    mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // Listen for location updates from Socket.IO
     socket.on('locationUpdate', ({ driverId, coordinates }) => {
@@ -50,6 +59,7 @@ const TrackModal = ({ bookingId, onClose }) => {
       // Remove the Mapbox instance if it exists
       if (mapRef.current) {
         mapRef.current.remove(); // Ensure map instance exists
+        mapRef.current = null;
       }
     };
   }, [bookingId, socket]);
@@ -74,8 +84,8 @@ const TrackModal = ({ bookingId, onClose }) => {
       mapRef.current.flyTo({
         center: [longitude, latitude],
         essential: true,
-        speed: 5,
-        zoom: 12,
+        speed: 1.2, // Adjust speed for smoother transition
+        zoom: 14, // Optional: Adjust zoom level if needed
       });
       console.log(`Map centered on: ${latitude}, ${longitude}`);
     }

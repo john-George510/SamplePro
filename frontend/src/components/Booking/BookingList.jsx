@@ -1,16 +1,23 @@
-// frontend/src/components/Booking/BookingList.jsx
+// src/components/Booking/BookingList.jsx
 
 import React from 'react';
 import BookingCard from './BookingCard';
-import { useSelector, useDispatch } from 'react-redux';
-import { jwtDecode } from 'jwt-decode';
+import { useSelector } from 'react-redux';
+import { jwtDecode } from 'jwt-decode'; // Corrected import
 
-const BookingList = ({ bookings, onTrack }) => {
+const BookingList = ({ bookings, onTrack, driverLocation }) => {
   const user = useSelector((state) => state.user);
   const role = user.role;
 
-  const decodedToken = jwtDecode(user.token); // Decode the JWT
-  const userId = decodedToken.userId;
+  let userId = null;
+  if (user.token) {
+    try {
+      const decodedToken = jwtDecode(user.token); // Corrected usage
+      userId = decodedToken.userId;
+    } catch (error) {
+      console.error('Invalid token:', error);
+    }
+  }
 
   console.log('userId', typeof userId);
   if (!bookings || bookings.length === 0) return <p>No bookings available.</p>;
@@ -20,6 +27,7 @@ const BookingList = ({ bookings, onTrack }) => {
     role === 'driver'
       ? bookings // Show all bookings for drivers
       : bookings.filter((booking) => booking.user === userId);
+
   return (
     <div>
       <h3>Bookings</h3>
@@ -28,7 +36,8 @@ const BookingList = ({ bookings, onTrack }) => {
           <BookingCard
             key={booking._id}
             booking={booking}
-            showAcceptButton={role === 'driver'} // Show accept button only for drivers
+            driverLocation={driverLocation}
+            showAcceptButton={role === 'driver'}
             onTrack={onTrack}
           />
         ))
