@@ -1,7 +1,7 @@
 import api from './api';
 
-const createBooking = (bookingData) => api.post('/bookings', bookingData);
+const createBooking = (bookingData) => api.post('/api/bookings', bookingData);
 
-const getUserBookings = () => api.get('/bookings');
+const getUserBookings = () => api.get('/api/bookings');
 
 export default { createBooking, getUserBookings };

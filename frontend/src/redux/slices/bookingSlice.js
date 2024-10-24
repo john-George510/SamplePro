@@ -20,7 +20,7 @@ export const fetchUserBookings = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       };
-      const { data } = await axios.get('/bookings/all', config);
+      const { data } = await axios.get('/api/bookings/all', config);
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -49,7 +49,7 @@ export const acceptBooking = createAsyncThunk(
         },
       };
 
-      const { data } = await axios.put(`/bookings/${bookingId}/assign`, { 
+      const { data } = await axios.put(`/api/bookings/${bookingId}/assign`, { 
         status: 'Assigned', 
         driver: user.id // Ensure the driver ID is sent correctly 
       }, config); // Empty body
@@ -84,7 +84,7 @@ export const fetchNearbyBookings = createAsyncThunk(
           longitude,
         },
       };
-      const { data } = await axios.get('/bookings/all', config);
+      const { data } = await axios.get('/api/bookings/all', config);
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -113,7 +113,7 @@ export const createBooking = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       };
-      const { data } = await axios.post('/bookings', bookingData, config);
+      const { data } = await axios.post('/api/bookings', bookingData, config);
       return data;
     } catch (error) {
       return rejectWithValue(

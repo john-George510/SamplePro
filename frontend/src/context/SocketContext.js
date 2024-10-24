@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      const newSocket = io(process.env.REACT_APP_API_URL, { 
+      const newSocket = io(process.env.REACT_APP_API_URL, { // Replace with your backend URL if different
         auth: {
           token: token,
         },
