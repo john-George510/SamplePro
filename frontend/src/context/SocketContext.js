@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      const newSocket = io('http://localhost:5000', { // Replace with your backend URL if different
+      const newSocket = io(process.env.REACT_APP_API_URL, { 
         auth: {
           token: token,
         },

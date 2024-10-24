@@ -197,7 +197,6 @@ const BookingCard = ({
   const handleStatusUpdate = (status) => {
     // Emit status update via Socket.IO
     socket.emit('driverStatusUpdate', { bookingId: booking._id, status });
-    // Optionally, update the booking status in Redux state
   };
 
   return (
