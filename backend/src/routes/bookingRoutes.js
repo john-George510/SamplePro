@@ -17,7 +17,7 @@ router.get('/all', authMiddleware, async (req, res) => {
   try {
     const { latitude, longitude } = req.query;
     const bookings = await Booking.find({})
-    console.log(bookings);
+    // console.log(bookings);
     
     res.json(bookings);
   } catch (error) {

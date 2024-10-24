@@ -1,8 +1,7 @@
-// frontend/src/pages/Dashboard.jsx
-
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
+import throttle from 'lodash/throttle';
 import BookingForm from '../components/Booking/BookingForm';
 import BookingList from '../components/Booking/BookingList';
 import FleetManagement from '../components/Admin/FleetManagement';
@@ -11,33 +10,59 @@ import {
   fetchUserBookings,
   fetchNearbyBookings,
 } from '../redux/slices/bookingSlice';
-import { SocketContext } from '../context/SocketContext'; // Ensure correct import
+import { SocketContext } from '../context/SocketContext';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const socket = useContext(SocketContext); // Access the socket instance
+  const socket = useContext(SocketContext);
   const userRole = useSelector((state) => state.user.role);
-  const bookingStatus = useSelector((state) => state.bookings.status);
-  const error = useSelector((state) => state.bookings.error);
   const bookings = useSelector((state) => state.bookings.bookings);
   const user = useSelector((state) => state.user);
 
   const [driverLocation, setDriverLocation] = useState(null);
-  const [trackingBookingId, setTrackingBookingId] = useState(null); // To track which booking is being tracked
+  const [trackingBookingId, setTrackingBookingId] = useState(null);
+  const [isTracking, setIsTracking] = useState(false); // To toggle tracking
+  const lastLocation = useRef(null); // Store the last known location
 
-  // Decode the JWT token to get userId
   const decodedToken = jwtDecode(user.token);
-  const userId = decodedToken.userId || decodedToken.id; // Adjust based on JWT payload
+  const userId = decodedToken.userId || decodedToken.id;
+  const joinedRooms = useRef(new Set());
   console.log('Decoded user ID:', userId);
 
-  // Log the user object to inspect its structure
-  console.log('User object:', user);
+  // Throttle function to send location updates at intervals
+  const emitThrottledLocation = throttle((bookingId, latitude, longitude) => {
+    socket.emit('driverLocationUpdate', {
+      bookingId,
+      driverId: userId,
+      coordinates: { latitude, longitude },
+    });
+    console.log(`Location update emitted for booking ID: ${bookingId}`);
+    lastLocation.current = { latitude, longitude };
+  }, 15000);
 
+  useEffect(() => {
+    if (userRole === 'driver' && socket && socket.connected) {
+      bookings.forEach((booking) => {
+        if (
+          booking.status === 'Assigned' &&
+          booking.driver &&
+          booking.driver.toString() === userId &&
+          !joinedRooms.current.has(booking._id)
+        ) {
+          console.log(
+            `Emitting joinBookingRoom event for booking: ${booking._id}`
+          );
+          socket.emit('joinBookingRoom', { bookingId: booking._id });
+          joinedRooms.current.add(booking._id);
+        }
+      });
+    }
+  }, [userRole, bookings, socket, userId]);
+
+  // Fetch bookings based on user role
   useEffect(() => {
     if (userRole === 'user') {
       dispatch(fetchUserBookings());
-      console.log('User role:', userRole);
-      console.log('Bookings from dashboard:', bookings);
     } else if (userRole === 'driver') {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -45,106 +70,89 @@ const Dashboard = () => {
             const { latitude, longitude } = position.coords;
             setDriverLocation({ latitude, longitude });
             dispatch(fetchNearbyBookings({ latitude, longitude }));
-            console.log(`Driver's initial location: ${latitude}, ${longitude}`);
           },
-          (error) => {
-            console.error('Error getting location:', error);
-            // Optionally, display an error message to the driver
-          }
+          (error) => console.error('Geolocation error:', error),
+          { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
         );
-      } else {
-        console.error('Geolocation is not supported by this browser.');
-        // Optionally, display an error message to the driver
       }
     }
-  }, [dispatch, userRole]);
+  }, [userRole, dispatch, bookings, userId, socket]);
 
-  // Effect to emit location updates
+  // Emit location updates only when tracking is active
   useEffect(() => {
-    if (userRole === 'driver' && driverLocation && socket) {
-      // Use watchPosition to continuously track the driver's location
-      const watchId = navigator.geolocation.watchPosition(
+    let watchId;
+
+    if (userRole === 'driver' && socket) {
+      console.log('Driver connected, starting location watch...');
+
+      // Watch the driver's location continuously
+      watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setDriverLocation({ latitude, longitude });
-          console.log(`Updated driver location: ${latitude}, ${longitude}`);
+          console.log('Driver position updated:', { latitude, longitude });
 
-          // Emit location update to the server for each assigned booking
-          bookings.forEach((booking, index) => {
-            console.log(`Processing booking at index ${index}:`, booking);
+          setDriverLocation({ latitude, longitude });
+
+          // Emit location update to the assigned booking room
+          bookings.forEach((booking) => {
             if (
               booking.status === 'Assigned' &&
               booking.driver &&
-              booking.driver.toString() === userId.toString()
+              booking.driver.toString() === userId
             ) {
               socket.emit('driverLocationUpdate', {
                 bookingId: booking._id,
                 driverId: userId,
                 coordinates: { latitude, longitude },
               });
-              console.log(
-                `Emitted location update for booking ID: ${booking._id}`
-              );
-
-              // Ensure driver joins the booking room
-              socket.emit('joinBookingRoom', { bookingId: booking._id });
-              console.log(`Driver joined booking room: ${booking._id}`);
-            } else {
-              console.log(`Skipping booking ID: ${booking._id}`);
+              console.log(`Location emitted for booking ${booking._id}`);
             }
           });
         },
-        (error) => {
-          console.error('Error watching position:', error);
-          // Optionally, display an error message to the driver
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 10000, // Update every 10 seconds
-          timeout: 5000,
-        }
+        (error) => console.error('Error watching driver position:', error),
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
       );
-
-      return () => {
-        navigator.geolocation.clearWatch(watchId);
-        console.log('Cleared geolocation watch');
-      };
     }
-  }, [driverLocation, bookings, userRole, userId, socket]);
 
-  // Effect to ensure driver joins all assigned booking rooms on load
-  useEffect(() => {
-    if (userRole === 'driver' && bookings.length > 0 && socket) {
-      bookings.forEach((booking) => {
-        if (
-          booking.status === 'Assigned' &&
-          booking.driver &&
-          booking.driver.toString() === userId.toString()
-        ) {
-          socket.emit('joinBookingRoom', { bookingId: booking._id });
-          console.log(`Driver joined booking room: ${booking._id}`);
-        }
-      });
-    }
-  }, [userRole, bookings, userId, socket]);
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+    };
+  }, [userRole, bookings, socket, userId]);
 
   const handleTrack = (bookingId) => {
     setTrackingBookingId(bookingId);
-    // Join the booking room for real-time updates
-    socket.emit('joinBookingRoom', { bookingId: bookingId });
-    console.log(`Joined booking room: ${bookingId}`);
-  };
+    setIsTracking(true); // Enable tracking
 
-  const handleCloseTrack = () => {
-    if (trackingBookingId && socket) {
-      socket.emit('leaveBookingRoom', { bookingId: trackingBookingId });
-      console.log(`Left booking room: ${trackingBookingId}`);
-      setTrackingBookingId(null);
+    if (socket && socket.connected) {
+      socket.emit('joinBookingRoom', { bookingId });
+      console.log(`Driver joined booking room: ${bookingId}`);
+    } else {
+      console.error('Socket not connected. Cannot join room.');
     }
   };
 
-  if (bookingStatus === 'loading') return <p>Loading bookings...</p>;
-  if (bookingStatus === 'failed') return <p>Error: {error}</p>;
+  const handleCloseTrack = () => {
+    setIsTracking(false); // Disable tracking
+    if (trackingBookingId) {
+      socket.emit('leaveBookingRoom', { bookingId: trackingBookingId });
+      setTrackingBookingId(null);
+      console.log(`Tracking stopped for booking ID: ${trackingBookingId}`);
+    }
+  };
+
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c * 1000; // Distance in meters
+  };
 
   if (userRole === 'user') {
     return (

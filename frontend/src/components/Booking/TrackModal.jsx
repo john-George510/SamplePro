@@ -1,11 +1,9 @@
-// frontend/src/components/Booking/TrackModal.jsx
-
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { SocketContext } from '../../context/SocketContext';
 import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox CSS
 
-mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN'; // Replace with your Mapbox token
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN; // Replace with your Mapbox token
 
 const TrackModal = ({ bookingId, onClose }) => {
   const mapContainerRef = useRef(null);
@@ -30,13 +28,13 @@ const TrackModal = ({ bookingId, onClose }) => {
       setDriverLocation(coordinates);
     });
 
-    // Listen for status updates from Socket.IO
+    // Listen for status updates
     socket.on('statusUpdate', ({ status }) => {
       console.log('Received status update:', status);
       setStatus(status);
     });
 
-    // Join the booking room to listen for updates specific to this booking
+    // Join the booking room to listen for updates
     socket.emit('joinBookingRoom', { bookingId });
     console.log(`Joined booking room: ${bookingId}`);
 
@@ -44,11 +42,15 @@ const TrackModal = ({ bookingId, onClose }) => {
       // Cleanup event listeners
       socket.off('locationUpdate');
       socket.off('statusUpdate');
-      // Leave the booking room when modal is closed
+
+      // Leave the booking room
       socket.emit('leaveBookingRoom', { bookingId });
       console.log(`Left booking room: ${bookingId}`);
-      // Remove the map instance
-      if (mapRef.current) mapRef.current.remove();
+
+      // Remove the Mapbox instance if it exists
+      if (mapRef.current) {
+        mapRef.current.remove(); // Ensure map instance exists
+      }
     };
   }, [bookingId, socket]);
 
@@ -56,10 +58,10 @@ const TrackModal = ({ bookingId, onClose }) => {
     if (driverLocation && mapRef.current) {
       const { latitude, longitude } = driverLocation;
 
+      // Initialize the marker if it doesn't exist
       if (!markerRef.current) {
-        // Add marker if it doesn't exist
         markerRef.current = new mapboxgl.Marker({ color: 'red' })
-          .setLngLat([longitude, latitude]) // [lng, lat]
+          .setLngLat([longitude, latitude])
           .addTo(mapRef.current);
         console.log('Added marker to the map.');
       } else {
@@ -72,7 +74,8 @@ const TrackModal = ({ bookingId, onClose }) => {
       mapRef.current.flyTo({
         center: [longitude, latitude],
         essential: true,
-        speed: 0.5, // Make the flyTo animation smoother
+        speed: 5,
+        zoom: 12,
       });
       console.log(`Map centered on: ${latitude}, ${longitude}`);
     }

@@ -4,8 +4,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '../../services/authService';
 
 const initialState = {
-  token: localStorage.getItem('token') || null,
-  role: localStorage.getItem('role') || null,
+  token: sessionStorage.getItem('token') || null,
+  role: sessionStorage.getItem('role') || null,
   status: 'idle',
   error: null,
 };
@@ -52,8 +52,8 @@ const userSlice = createSlice({
       state.role = null;
       state.status = 'idle';
       state.error = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('role');
     },
   },
   extraReducers: (builder) => {
@@ -64,8 +64,8 @@ const userSlice = createSlice({
         state.role = action.payload.role;
         state.status = 'succeeded';
         state.error = null;
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('role', action.payload.role);
+        sessionStorage.setItem('token', action.payload.token);
+        sessionStorage.setItem('role', action.payload.role);
       })
       // Handle register.rejected
       .addCase(register.rejected, (state, action) => {
@@ -78,8 +78,8 @@ const userSlice = createSlice({
         state.role = action.payload.role;
         state.status = 'succeeded';
         state.error = null;
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('role', action.payload.role);
+        sessionStorage.setItem('token', action.payload.token);
+        sessionStorage.setItem('role', action.payload.role);
       })
       // Handle login.rejected
       .addCase(login.rejected, (state, action) => {

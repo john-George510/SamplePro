@@ -38,7 +38,7 @@ exports.createBooking = async (req, res) => {
       distance: distance,
     });
 
-    console.log(booking);
+    // console.log(booking);
 
     await booking.save();
 

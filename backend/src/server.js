@@ -49,13 +49,16 @@ io.on('connection', (socket) => {
   // Handle driver-specific events
   if (socket.user.role === 'driver') {
     // Listen for clients joining a booking room
+    console.log("socket user tried to join booking room")
     socket.on('joinBookingRoom', ({ bookingId }) => {
+      console.log(`Received joinBookingRoom event for booking ID: ${bookingId}`);
       socket.join(bookingId);
       console.log(`Driver ${socket.user.userId} joined room: ${bookingId}`);
     });
 
     // Listen for driver location updates
-    socket.on('driverLocationUpdate', async ({ bookingId, coordinates }) => {
+    socket.on('driverLocationUpdate', async ({ bookingId, driverId,coordinates }) => {
+      console.log("driver location update received")
       try {
         if (!mongoose.Types.ObjectId.isValid(bookingId)) {
           throw new Error('Invalid booking ID');
@@ -71,7 +74,7 @@ io.on('connection', (socket) => {
         await redisClient.hSet('driverLocations', socket.user.userId, JSON.stringify(coordinates));
 
         // Emit location update to the booking room
-        io.to(bookingId).emit('locationUpdate', { driverId: socket.user.userId, coordinates });
+        io.to(bookingId).emit('locationUpdate', { bookingId,driverId: socket.user.userId, coordinates });
         console.log(`Driver ${socket.user.userId} location updated for booking ${bookingId}:`, coordinates);
       } catch (error) {
         console.error('Error in driverLocationUpdate:', error.message);
@@ -112,7 +115,7 @@ io.on('connection', (socket) => {
     socket.on('joinBookingRoom', ({ bookingId }) => {
       socket.join(bookingId);
       console.log(`User ${socket.user.userId} joined room: ${bookingId}`);
-      console.log("socket user", socket.user)
+      // console.log("socket user", socket.user)
     });
   }
 
