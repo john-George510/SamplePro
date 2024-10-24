@@ -45,7 +45,6 @@ const BookingForm = () => {
       alert('Please select both pickup and dropoff locations.');
       return;
     }
-    console.log(pickupLocation, dropoffLocation, vehicleType);
     // Check if user is authenticated
     if (!token) {
       alert('You must be logged in to create a booking.');

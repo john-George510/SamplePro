@@ -34,7 +34,6 @@ const BookingCard = ({
   const reverseGeocode = async (longitude, latitude) => {
     const key = `${latitude},${longitude}`;
     if (addressCache.current[key]) {
-      console.log(`Address fetched from cache for coordinates: ${key}`);
       return addressCache.current[key];
     }
     try {
@@ -45,7 +44,6 @@ const BookingCard = ({
       if (data.features && data.features.length > 0) {
         const address = data.features[0].place_name;
         addressCache.current[key] = address; // Cache the result
-        console.log(`Address fetched from API for coordinates: ${key}`);
         return address;
       }
       return 'Unknown location';
@@ -61,19 +59,15 @@ const BookingCard = ({
       if (booking.pickupLocation && booking.pickupLocation.coordinates) {
         const [pickupLongitude, pickupLatitude] =
           booking.pickupLocation.coordinates;
-        console.log('Fetching pickup address...');
         const address = await reverseGeocode(pickupLongitude, pickupLatitude);
         setPickupAddress(address);
-        console.log('Pickup address set:', address);
       }
 
       if (booking.dropoffLocation && booking.dropoffLocation.coordinates) {
         const [dropoffLongitude, dropoffLatitude] =
           booking.dropoffLocation.coordinates;
-        console.log('Fetching dropoff address...');
         const address = await reverseGeocode(dropoffLongitude, dropoffLatitude);
         setDropoffAddress(address);
-        console.log('Dropoff address set:', address);
       }
     };
 
@@ -99,7 +93,6 @@ const BookingCard = ({
   const debouncedCalculateDistanceBetween = useRef(
     debounce((lat1, lon1, lat2, lon2) => {
       const distance = calculateDistance(lat1, lon1, lat2, lon2);
-      console.log(`Distance between Pickup and Dropoff: ${distance} km`);
       setDistanceBetweenLocations(distance);
     }, 500)
   ).current;
@@ -108,14 +101,12 @@ const BookingCard = ({
   const debouncedCalculateDistanceToPickup = useRef(
     debounce((lat1, lon1, lat2, lon2) => {
       const distance = calculateDistance(lat1, lon1, lat2, lon2);
-      console.log(`Distance from Driver to Pickup: ${distance} km`);
       setDistanceToPickup(distance);
     }, 500)
   ).current;
 
   // Calculate distance between Pickup and Dropoff
   useEffect(() => {
-    console.log('Pickup coordinates', booking.pickupLocation.coordinates);
     if (
       booking.pickupLocation &&
       booking.pickupLocation.coordinates &&
@@ -126,9 +117,6 @@ const BookingCard = ({
         booking.pickupLocation.coordinates;
       const [dropoffLongitude, dropoffLatitude] =
         booking.dropoffLocation.coordinates;
-      console.log('Calculating distances for booking:', booking._id);
-      console.log('Pickup:', pickupLatitude, pickupLongitude);
-      console.log('Dropoff:', dropoffLatitude, dropoffLongitude);
 
       // Validate coordinates
       if (
@@ -148,7 +136,6 @@ const BookingCard = ({
         dropoffLatitude,
         dropoffLongitude
       );
-      console.log(`Distance between Pickup and Dropoff: ${distance} km`);
       setDistanceBetweenLocations(distance);
     }
   }, [booking, debouncedCalculateDistanceBetween]);
@@ -163,7 +150,6 @@ const BookingCard = ({
     ) {
       const [pickupLongitude, pickupLatitude] =
         booking.pickupLocation.coordinates;
-      console.log('Calculating distance from Driver to Pickup...');
 
       // Validate coordinates
       if (
@@ -206,13 +192,11 @@ const BookingCard = ({
   const handleAccept = () => {
     dispatch(acceptBooking(booking._id));
     socket.emit('joinBookingRoom', { bookingId: booking._id });
-    console.log(`Accepted and joined booking room: ${booking._id}`);
   };
 
   const handleStatusUpdate = (status) => {
     // Emit status update via Socket.IO
     socket.emit('driverStatusUpdate', { bookingId: booking._id, status });
-    console.log(`Booking ${booking._id} status updated to: ${status}`);
     // Optionally, update the booking status in Redux state
   };
 

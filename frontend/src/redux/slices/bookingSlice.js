@@ -21,7 +21,6 @@ export const fetchUserBookings = createAsyncThunk(
         },
       };
       const { data } = await axios.get('/bookings/all', config);
-      console.log(data);
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -86,7 +85,6 @@ export const fetchNearbyBookings = createAsyncThunk(
         },
       };
       const { data } = await axios.get('/bookings/all', config);
-      console.log(data);
       return data;
     } catch (error) {
       return rejectWithValue(

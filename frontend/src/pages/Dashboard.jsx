@@ -35,7 +35,6 @@ const Dashboard = () => {
     try {
       decodedToken = jwtDecode(user.token); // Corrected usage
       userId = decodedToken.userId || decodedToken.id;
-      console.log('Decoded user ID:', userId);
     } catch (error) {
       console.error('Invalid token:', error);
     }
@@ -102,8 +101,6 @@ const Dashboard = () => {
     let watchId;
 
     if (userRole === 'driver' && socket) {
-      console.log('Driver connected, starting location watch...');
-
       // Watch the driver's location continuously
       watchId = navigator.geolocation.watchPosition(
         (position) => {
@@ -144,7 +141,6 @@ const Dashboard = () => {
 
     if (socket && socket.connected) {
       socket.emit('joinBookingRoom', { bookingId });
-      console.log(`Driver joined booking room: ${bookingId}`);
     } else {
       console.error('Socket not connected. Cannot join room.');
     }

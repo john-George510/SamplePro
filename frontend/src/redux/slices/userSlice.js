@@ -31,7 +31,6 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await authService.login(credentials);
-      console.log('response: ', response);
       return response.data;
     } catch (error) {
       return rejectWithValue(

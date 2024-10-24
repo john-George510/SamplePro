@@ -19,9 +19,7 @@ const BookingList = ({ bookings, onTrack, driverLocation }) => {
     }
   }
 
-  console.log('userId', typeof userId);
   if (!bookings || bookings.length === 0) return <p>No bookings available.</p>;
-  console.log('bookings', bookings);
 
   const filteredBookings =
     role === 'driver'
