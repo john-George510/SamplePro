@@ -125,7 +125,7 @@ const BookingCard = ({
         typeof dropoffLatitude !== 'number' ||
         typeof dropoffLongitude !== 'number'
       ) {
-        console.error('Invalid coordinates for booking:', booking._id);
+        console.error('Invalid coordinates for booking');
         setDistanceBetweenLocations('N/A');
         return;
       }
@@ -179,14 +179,12 @@ const BookingCard = ({
     setIsTracking(true);
     // Join the booking room for real-time updates
     socket.emit('joinBookingRoom', { bookingId: booking._id });
-    console.log(`Joined booking room: ${booking._id}`);
   };
 
   const handleCloseTrack = () => {
     setIsTracking(false);
     // Optionally, leave the booking room
     socket.emit('leaveBookingRoom', { bookingId: booking._id });
-    console.log(`Left booking room: ${booking._id}`);
   };
 
   const handleAccept = () => {

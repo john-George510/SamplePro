@@ -54,7 +54,6 @@ const Dashboard = () => {
       driverId: userId,
       coordinates: { latitude, longitude },
     });
-    console.log(`Location update emitted for booking ID: ${bookingId}`);
     lastLocation.current = { latitude, longitude };
   }, 15000);
 
@@ -67,9 +66,6 @@ const Dashboard = () => {
           booking.driver.toString() === userId &&
           !joinedRooms.current.has(booking._id)
         ) {
-          console.log(
-            `Emitting joinBookingRoom event for booking: ${booking._id}`
-          );
           socket.emit('joinBookingRoom', { bookingId: booking._id });
           joinedRooms.current.add(booking._id);
         }
@@ -105,7 +101,6 @@ const Dashboard = () => {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('Driver position updated:', { latitude, longitude });
 
           setDriverLocation({ latitude, longitude });
 
@@ -121,7 +116,6 @@ const Dashboard = () => {
                 driverId: userId,
                 coordinates: { latitude, longitude },
               });
-              console.log(`Location emitted for booking ${booking._id}`);
             }
           });
         },
@@ -151,7 +145,6 @@ const Dashboard = () => {
     if (trackingBookingId) {
       socket.emit('leaveBookingRoom', { bookingId: trackingBookingId });
       setTrackingBookingId(null);
-      console.log(`Tracking stopped for booking ID: ${trackingBookingId}`);
     }
   };
 
