@@ -15,13 +15,15 @@ exports.createBooking = async (req, res) => {
       price_per_tonne,
       expected_amount,
       insurance_supported,
-      expiration_hours
+      expiration_hours,
+      refrigeration_required,
+      fragile
     } = req.body;
 
     const userId = req.user.userId;
     // console.log("Request" , req);
     // console.log("User ID:", userId);
-    // console.log("Request Body:", req.body);
+    console.log("Request Body:", req.body);
 
     // Ensure source and destination exist and have correct structure
     if (!source || !destination ||
@@ -48,7 +50,10 @@ exports.createBooking = async (req, res) => {
       lorry_type,
       material_type,
       expiration_hours,
-      insurance_supported
+      insurance_supported,
+      quantity,
+      refrigeration_required,
+      fragile
     );
 
     const booking = new Booking({
@@ -65,7 +70,9 @@ exports.createBooking = async (req, res) => {
       expected_amount,
       insurance_supported,
       expiration_hours,
-      price
+      price,
+      refrigeration_required,
+      fragile
     });
 
     console.log("Booking Data Before Save:", booking);

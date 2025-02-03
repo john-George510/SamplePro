@@ -38,6 +38,8 @@ const BookingSchema = new mongoose.Schema({
   expiration_hours: { type: String, required: true },
   price: { type: Number }, // in USD
   driver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  refrigeration_required: { type: Boolean, default: false }, // Added refrigeration requirement
+  fragile: { type: Boolean, default: false }, // Added fragile handling requirement
   createdAt: { type: Date, default: Date.now },
 });
 

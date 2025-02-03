@@ -18,6 +18,8 @@ const BookingForm = () => {
   const [materialType, setMaterialType] = useState('');
   const [pricePerTonne, setPricePerTonne] = useState('');
   const [expectedAmount, setExpectedAmount] = useState('');
+  const [refrigerationRequired, setRefrigerationRequired] = useState(false);
+  const [fragile, setFragile] = useState(false);
   const [insuranceSupported, setInsuranceSupported] = useState(false);
   const [expirationHours, setExpirationHours] = useState('');
 
@@ -138,9 +140,21 @@ const BookingForm = () => {
           <label>Insurance Supported:</label>
           <input type="checkbox" checked={insuranceSupported} onChange={(e) => setInsuranceSupported(e.target.checked)} />
         </div>
+        
         <div className="form-group">
-          <label>Expiration Hours:</label>
-          <input type="text" value={expirationHours} onChange={(e) => setExpirationHours(e.target.value)} />
+          <label>Refrigeration Required:</label>
+          <input type="checkbox" checked={refrigerationRequired} onChange={(e) => setRefrigerationRequired(e.target.checked)} />
+        </div>
+
+        <div className="form-group">
+          <label>Fragile Handling:</label>
+          <input type="checkbox" checked={fragile} onChange={(e) => setFragile(e.target.checked)} />
+        </div>
+
+        <div className="form-group">
+          <label>Expiration Time:</label>
+          {/* make it ime field */}
+          <input type="datetime-local" value={expirationHours} onChange={(e) => setExpirationHours(e.target.value)} />
         </div>
         <button type="submit">Create Booking</button>
         {bookingStatus === 'failed' && <p className="error-message">{bookingError}</p>}

@@ -25,20 +25,19 @@ const getMaterialFactor = (materialType) => {
 
 const getUrgencyFactor = (expirationTime) => {
   // Extract hours and minutes using regex
-  const match = expirationTime.match(/(\d+)H(\d+)M/);
+  const expirationDate = new Date(expirationTime);
+  const now = new Date();
   
-  if (!match) return 1.0; // Default if format is incorrect
-
-  const hours = parseInt(match[1]); // Extract hours
-  const minutes = parseInt(match[2]); // Extract minutes
+  const diffMs = expirationDate - now;
+  if (diffMs <= 0) return 1.5; // If expired, return highest urgency
   
-  const totalHours = hours + (minutes / 60); // Convert total time to hours
+  const diffMinutes = diffMs / (1000 * 60);
+  const totalHours = diffMinutes / 60;
 
-  // Apply urgency pricing logic
   if (totalHours < 1) return 1.5;
   if (totalHours < 6) return 1.3;
   if (totalHours < 24) return 1.2;
-  return 1.0; // Default factor
+  return 1.0;
 };
 
 const haversineDistance = (coord1, coord2) => {
@@ -81,7 +80,7 @@ const getDemandFactor = async (pickup, dropoff, database) => {
   //Update the existing orders with the demand factor
   for (const order of nearbyOrders) {
     console.log("Existing Order:", order);
-    const insuranceCost = order.insurance_supported ? 50 : 0;
+    const insuranceCost = order.insurance_supported ? 500 : 0;
     console.log("Previous Price:", order.price);
     const priceWithoutInsurance = order.price - insuranceCost;
     console.log("Price Without Insurance:", priceWithoutInsurance);
@@ -106,16 +105,20 @@ const calculateDistance = (pickup, dropoff) => {
   return 2 * r * Math.asin(Math.sqrt(a)); // Approximate conversion to kilometers
 };
 
-exports.estimatePrice = async (pickupLocation, dropoffLocation, vehicleType, materialType, expirationTime, insuranceSupported) => {
+exports.estimatePrice = async (pickupLocation, dropoffLocation, vehicleType, materialType, expirationTime, insuranceSupported, quantity, refrigerationRequired, fragile) => {
   const distance = calculateDistance(pickupLocation, dropoffLocation);
   const basePrice = getBasePrice(vehicleType);
   const materialFactor = getMaterialFactor(materialType);
   const urgencyFactor = getUrgencyFactor(expirationTime);
-  const insuranceCost = insuranceSupported ? 50 : 0;
+  const insuranceCost = insuranceSupported ? 500 : 0;
   const demandFactor = await getDemandFactor(pickupLocation, dropoffLocation, 5); // 5 km radius
+  const commission = 1.1; // 10% commission
+
+  const refrigerationFactor = refrigerationRequired ? 1.2 : 1.0; // 20% extra for refrigeration
+  const fragileFactor = fragile ? 1.3 : 1.0; // 30% extra for fragile goods
 
   // Final price calculation
-  const price = (basePrice * distance * materialFactor * urgencyFactor * demandFactor) + insuranceCost;
+  const price = (basePrice * quantity * distance * materialFactor * urgencyFactor * demandFactor * commission * refrigerationFactor * fragileFactor) + insuranceCost;
   
   return { price, distance };
 };
