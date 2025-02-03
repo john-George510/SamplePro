@@ -7,6 +7,7 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
+    console.log('req.body in register', req.body);
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ msg: 'User already exists' });
@@ -25,8 +26,8 @@ exports.register = async (req, res) => {
       role: user.role,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+    const token = jwt.sign(payload, "fjhffdhjfdhfd", { expiresIn: '1h' });
+    console.log('token', token);
     res.json({ token, role: user.role });
   } catch (error) {
     res.status(500).json({ msg: error.message });

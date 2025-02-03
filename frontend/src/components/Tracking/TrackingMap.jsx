@@ -17,7 +17,7 @@ const TrackingMap = ({ bookingId }) => {
   });
 
   useEffect(() => {
-    const socket = io(process.env.REACT_APP_API_URL);
+    const socket = io("http://localhost:5000");
 
     // Join room based on bookingId
     socket.emit('join', bookingId);
@@ -42,7 +42,7 @@ const TrackingMap = ({ bookingId }) => {
       <h2>Driver Location</h2>
       <ReactMapGL
         {...viewport}
-        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+        mapboxApiAccessToken={"pk.eyJ1IjoiYWRpdHJhbWRhcyIsImEiOiJjbTJoZTVpa20wN2F3MmpzM3F2a2M3ZWNxIn0.ePD_ugk2QndekxDHx3ryhA"}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
       >
         <Marker latitude={location.latitude} longitude={location.longitude}>

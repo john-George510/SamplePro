@@ -6,7 +6,7 @@ import { SocketContext } from '../../context/SocketContext';
 import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox CSS
 
 // Set your Mapbox access token
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN; // Replace with your Mapbox token
+mapboxgl.accessToken = "pk.eyJ1IjoiYWRpdHJhbWRhcyIsImEiOiJjbTJoZTVpa20wN2F3MmpzM3F2a2M3ZWNxIn0.ePD_ugk2QndekxDHx3ryhA"; // Replace with your Mapbox token
 
 const TrackModal = ({ bookingId, onClose }) => {
   const mapContainerRef = useRef(null);

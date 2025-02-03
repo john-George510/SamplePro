@@ -3,7 +3,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+axios.defaults.baseURL = "http://localhost:5000";
 // Fetch user bookings
 export const fetchUserBookings = createAsyncThunk(
   'bookings/fetchUserBookings',

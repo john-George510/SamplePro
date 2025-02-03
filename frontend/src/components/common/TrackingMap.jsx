@@ -19,7 +19,7 @@ const TrackingMap = ({ bookingId }) => {
         zoom={12}
         width="100%"
         height="400px"
-        mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+        mapboxAccessToken={"pk.eyJ1IjoiYWRpdHJhbWRhcyIsImEiOiJjbTJoZTVpa20wN2F3MmpzM3F2a2M3ZWNxIn0.ePD_ugk2QndekxDHx3ryhA"}
         mapStyle="mapbox://styles/mapbox/streets-v11"
       >
         <Marker latitude={driverLocation.latitude} longitude={driverLocation.longitude}>
