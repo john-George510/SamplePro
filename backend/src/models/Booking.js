@@ -1,9 +1,9 @@
-// backend/models/Booking.js
-
 const mongoose = require('mongoose');
 
 const BookingSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  company_name: { type: String, required: true },
+  status: { type: String, enum: ['Pending', 'Assigned', 'Completed'], default: 'Pending' },
   pickupLocation: {
     type: {
       type: String,
@@ -28,10 +28,15 @@ const BookingSchema = new mongoose.Schema({
       required: true,
     },
   },
-  vehicleType: { type: String, enum: ['small', 'medium', 'large'], required: true },
+  lorry_type: { type: String, enum: ['small', 'medium', 'large'], required: true },
+  quantity: { type: Number, required: true },
   distance: { type: Number }, // in kilometers
+  material_type: { type: String, required: true },
+  price_per_tonne: { type: Number, required: true },
+  expected_amount: { type: Number, required: true },
+  insurance_supported: { type: Boolean, default: false },
+  expiration_hours: { type: String, required: true },
   price: { type: Number }, // in USD
-  status: { type: String, enum: ['Pending', 'Assigned', 'Completed'], default: 'Pending' },
   driver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now },
 });

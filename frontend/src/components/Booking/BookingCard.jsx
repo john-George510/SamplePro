@@ -202,13 +202,17 @@ const BookingCard = ({
       {/* Removed Booking ID Display */}
 
       <p>
+        <strong>Company Name:</strong> {booking.company_name}
+      </p>
+
+      <p>
         <strong>Pickup Location:</strong> {pickupAddress}
       </p>
       <p>
         <strong>Dropoff Location:</strong> {dropoffAddress}
       </p>
       <p>
-        <strong>Vehicle Type:</strong> {booking.vehicleType}
+        <strong>Vehicle Type:</strong> {booking.lorry_type}
       </p>
 
       {/* Display distance between Pickup and Dropoff for all roles */}
@@ -229,7 +233,7 @@ const BookingCard = ({
 
       <p>
         <strong>Price:</strong>{' '}
-        {booking.price ? `$${booking.price.toFixed(2)}` : 'N/A'}
+        {booking.price ? `₹${booking.price.toFixed(2)}` : 'N/A'}
       </p>
       <p>
         <strong>Status:</strong> {booking.status}

@@ -90,7 +90,7 @@ const Dashboard = () => {
         );
       }
     }
-  }, [userRole, dispatch, bookings, userId, socket]);
+  }, [userRole, dispatch, userId]);
 
   // Emit location updates only when tracking is active
   useEffect(() => {
