@@ -69,6 +69,30 @@ const getNearbyOrders = async (pickup, dropoff, radius = 5) => {
   });
 };
 
+async function getFuelPrice(state) {
+  try {
+      const response = await fetch("https://www.cardekho.com/fuel-price");
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      
+      const html = await response.text();
+      
+      const regex = new RegExp(
+          `<a href="https://www.cardekho.com/[^"]*-${state.toLowerCase()}-state"[^>]*>[^<]*</a></td><td>₹ ([0-9.]+)</td>`,
+          "i"
+      );
+      
+      const match = html.match(regex);
+      
+      return match ? `₹ ${match[1]}` : `Price not found for ${state}`;
+  } catch (error) {
+      console.error("Error fetching fuel price:", error);
+  }
+}
+
+
+getFuelPrice("Kerala").then(console.log);
+
+
 const getDemandFactor = async (pickup, dropoff, database) => {
   const nearbyOrders = await getNearbyOrders(pickup, dropoff, database);
   console.log("Nearby Orders:", nearbyOrders);
