@@ -3,23 +3,33 @@
 import React from 'react';
 import BookingCard from './BookingCard';
 import { useSelector } from 'react-redux';
-import { jwtDecode } from 'jwt-decode'; // Corrected import
+import { jwtDecode } from 'jwt-decode';
+import { combineBookings } from '../../services/bookingService';
 
-const BookingList = ({ bookings, onTrack, driverLocation }) => {
+const BookingList = ({ bookings, onTrack, driverLocation, onBookingsUpdate }) => {
   const user = useSelector((state) => state.user);
   const role = user.role;
 
   let userId = null;
   if (user.token) {
     try {
-      const decodedToken = jwtDecode(user.token); // Corrected usage
+      const decodedToken = jwtDecode(user.token);
       userId = decodedToken.userId;
     } catch (error) {
       console.error('Invalid token:', error);
     }
   }
 
-  if (!bookings || bookings.length === 0) return <p>No bookings available.</p>;
+  const handleCombineRoutes = async (booking1Id, booking2Id) => {
+    try {
+      await combineBookings(booking1Id, booking2Id);
+      // Notify parent component to refresh bookings
+      if (onBookingsUpdate) {
+        onBookingsUpdate();
+      }
+    } catch (error) {
+    }
+  };
 
   const filteredBookings =
     role === 'driver'
@@ -27,18 +37,30 @@ const BookingList = ({ bookings, onTrack, driverLocation }) => {
       : bookings.filter((booking) => booking.user === userId);
 
   return (
-    <div>
+    <div className="booking-list">
       <h3>Bookings</h3>
       {filteredBookings.length > 0 ? (
-        filteredBookings.map((booking) => (
-          <BookingCard
-            key={booking._id}
-            booking={booking}
-            driverLocation={driverLocation}
-            showAcceptButton={role === 'driver'}
-            onTrack={onTrack}
-          />
-        ))
+        filteredBookings.map((booking) => {
+          console.log('bookings', bookings);
+          // Filter out the current booking and only show pending bookings for route combination
+          const otherBookings = bookings.filter(
+            (otherBooking) =>
+              otherBooking._id !== booking._id &&
+              otherBooking.status === 'Pending'
+          );
+          console.log('otherBookings', otherBookings);
+          return (
+            <BookingCard
+              key={booking._id}
+              booking={booking}
+              showAcceptButton={booking.status === 'Pending' && role === 'driver'}
+              onTrack={onTrack}
+              driverLocation={driverLocation}
+              otherBookings={booking.status === 'Pending' ? otherBookings : []}
+              onCombineRoutes={handleCombineRoutes}
+            />
+          );
+        })
       ) : (
         <p>
           {role === 'driver'

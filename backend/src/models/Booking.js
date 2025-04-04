@@ -41,6 +41,37 @@ const BookingSchema = new mongoose.Schema({
   refrigeration_required: { type: Boolean, default: false }, // Added refrigeration requirement
   fragile: { type: Boolean, default: false }, // Added fragile handling requirement
   createdAt: { type: Date, default: Date.now },
+  // Add fields for combined routes
+  isCombinedRoute: {
+    type: Boolean,
+    default: false
+  },
+  combinedBookings: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Booking'
+  }],
+  routeOrder: [{
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+        required: true,
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+    },
+    stopType: {
+      type: String,
+      enum: ['pickup', 'dropoff']
+    },
+    order: Number
+  }],
+  combinedPrice: {
+    type: Number
+  }
 });
 
 // Create a 2dsphere index on pickupLocation for geospatial queries

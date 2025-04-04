@@ -327,3 +327,139 @@ button:hover {
     padding: 10px;
   }
 }
+
+/* Route Combination Card Styles */
+.route-combination-card {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.route-combination-card h4 {
+  color: #4CAF50;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.route-details {
+  margin-bottom: 15px;
+}
+
+.route-details p {
+  margin: 8px 0;
+  color: #fff;
+}
+
+.route-details strong {
+  color: #4CAF50;
+}
+
+.route-order {
+  margin: 15px 0;
+}
+
+.route-order h5 {
+  color: #4CAF50;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.route-order ol {
+  margin: 0;
+  padding-left: 20px;
+  color: #fff;
+}
+
+.route-order li {
+  margin: 5px 0;
+}
+
+.combine-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.combine-button:hover {
+  background-color: #45a049;
+}
+
+/* Route Combinations Section */
+.route-combinations {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.route-combinations h4 {
+  color: #4CAF50;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.route-combinations .route-combination-card {
+  margin-bottom: 15px;
+}
+
+.route-combinations .route-combination-card:last-child {
+  margin-bottom: 0;
+}
+
+/* Loading and Error States */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #fff;
+}
+
+.error {
+  text-align: center;
+  padding: 20px;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.combined-route-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.combined-route-info h4 {
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+}
+
+.combined-route-info .route-order {
+  margin-top: 0.75rem;
+}
+
+.combined-route-info .route-order h5 {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.combined-route-info ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.combined-route-info li {
+  margin-bottom: 0.25rem;
+  color: #6c757d;
+}

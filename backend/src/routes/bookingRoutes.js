@@ -5,6 +5,7 @@ const router = express.Router();
 const { createBooking, getUserBookings } = require('../controllers/bookingController');
 const authMiddleware = require('../middleware/authMiddleware');
 const Booking = require('../models/Booking'); // Ensure Booking model is imported
+const bookingController = require('../controllers/bookingController');
 
 // Create a booking
 router.post('/', authMiddleware, createBooking);
@@ -73,5 +74,8 @@ router.put('/:bookingid/assign', authMiddleware, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+// Add the route for combining bookings
+router.post('/combine', authMiddleware, bookingController.combineBookings);
 
 module.exports = router;

@@ -125,6 +125,36 @@ export const createBooking = createAsyncThunk(
   }
 );
 
+// Define the combine booking slice
+export const combineBooking = createAsyncThunk(
+  'bookings/combine',
+  async (bookingData, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().user.token; // Correctly accessing token directly
+
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const { data } = await axios.post('/api/bookings/combine', bookingData, config);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
+
 const bookingSlice = createSlice({
   name: 'bookings',
   initialState: {

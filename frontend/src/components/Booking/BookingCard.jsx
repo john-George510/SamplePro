@@ -6,6 +6,7 @@ import { acceptBooking } from '../../redux/slices/bookingSlice';
 import { SocketContext } from '../../context/SocketContext';
 import TrackModal from './TrackModal';
 import debounce from 'lodash/debounce';
+import RouteCombinationCard from './RouteCombinationCard';
 
 // Ensure Mapbox CSS is imported
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -15,6 +16,8 @@ const BookingCard = ({
   showAcceptButton,
   onTrack,
   driverLocation,
+  otherBookings = [],
+  onCombineRoutes,
 }) => {
   const dispatch = useDispatch();
   const socket = useContext(SocketContext);
@@ -22,6 +25,7 @@ const BookingCard = ({
   const [isTracking, setIsTracking] = useState(false);
   const [pickupAddress, setPickupAddress] = useState('');
   const [dropoffAddress, setDropoffAddress] = useState('');
+  const [locationAddress, setLocationAddress] = useState([]);
   const [distanceBetweenLocations, setDistanceBetweenLocations] =
     useState(null);
   const [distanceToPickup, setDistanceToPickup] = useState(null);
@@ -69,6 +73,23 @@ const BookingCard = ({
         const address = await reverseGeocode(dropoffLongitude, dropoffLatitude);
         setDropoffAddress(address);
       }
+
+      console.log(booking.routeOrder);
+      if (booking.routeOrder && booking.routeOrder.length > 0) {
+        const addresses = await Promise.all(
+          booking.routeOrder.map(async (stop) => {
+            if (stop.location) {
+              console.log(stop.location.coordinates);
+              const [longitude, latitude] = stop.location.coordinates;
+              return await reverseGeocode(longitude, latitude);
+            }
+            return 'Unknown location';
+          })
+        );
+        console.log(addresses);
+        setLocationAddress(addresses);
+      }
+
     };
 
     fetchAddresses();
@@ -82,9 +103,9 @@ const BookingCard = ({
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return (R * c).toFixed(2); // Distance in km
   };
@@ -233,11 +254,30 @@ const BookingCard = ({
 
       <p>
         <strong>Price:</strong>{' '}
-        {booking.price ? `₹${booking.price.toFixed(2)}` : 'N/A'}
+        {booking.isCombinedRoute ? booking.combinedPrice ?`₹${booking.combinedPrice.toFixed(2)}` : 'N/A' : booking.price ? `₹${booking.price.toFixed(2)}` : 'N/A'}
       </p>
       <p>
         <strong>Status:</strong> {booking.status}
       </p>
+
+
+      {/* Combined */}
+      <p>
+        <strong>Combined Route:</strong>{' '}
+        {booking.isCombinedRoute ? 'Yes' : 'No'}
+      </p>
+
+      {/* Route Order */}
+      {booking.isCombinedRoute && 
+        <p>
+          <strong>Route Order:</strong>{' '}
+          <ol>
+            {locationAddress.map((address, index) => (
+              <li key={index}>{address}</li>
+            ))}
+          </ol>
+        </p>
+      }
 
       {showAcceptButton && booking.status === 'Pending' && (
         <button onClick={handleAccept}>Accept Booking</button>
@@ -268,6 +308,21 @@ const BookingCard = ({
 
       {isTracking && (
         <TrackModal bookingId={booking._id} onClose={handleCloseTrack} />
+      )}
+
+      {/* Show potential route combinations for drivers */}
+      {role === 'driver' && otherBookings.length > 0 && (
+        <div className="route-combinations">
+          <h4>Potential Route Combinations</h4>
+          {otherBookings.map((otherBooking) => (
+            <RouteCombinationCard
+              key={otherBooking._id}
+              booking1={booking}
+              booking2={otherBooking}
+              onCombine={onCombineRoutes}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
