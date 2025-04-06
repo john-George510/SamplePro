@@ -22,7 +22,7 @@ const BookingForm = () => {
     refrigerationRequired: false,
     fragile: false,
     insuranceSupported: false,
-    expirationHours: '',
+    expirationTime: '',
   };
 
   const [formData, setFormData] = useState(initialState);
@@ -99,7 +99,7 @@ const BookingForm = () => {
       price_per_tonne: parseFloat(formData.pricePerTonne) || 70,
       expected_amount: parseFloat(formData.expectedAmount) || 80,
       insurance_supported: formData.insuranceSupported,
-      expiration_hours: formData.expirationHours,
+      expiration_time: formData.expirationTime,
       created_at: new Date().toISOString(),
     };
 
@@ -210,8 +210,8 @@ const BookingForm = () => {
           <label>Expiration Time:</label>
           <input
             type="datetime-local"
-            name="expirationHours"
-            value={formData.expirationHours}
+            name="expirationTime"
+            value={formData.expirationTime}
             onChange={handleChange}
           />
         </div>

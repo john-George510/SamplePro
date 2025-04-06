@@ -35,7 +35,7 @@ const BookingSchema = new mongoose.Schema({
   price_per_tonne: { type: Number, required: true },
   expected_amount: { type: Number, required: true },
   insurance_supported: { type: Boolean, default: false },
-  expiration_hours: { type: String, required: true },
+  expiration_time: { type: Date, required: true }, // Changed from expiration_time
   price: { type: Number }, // in USD
   driver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   refrigeration_required: { type: Boolean, default: false }, // Added refrigeration requirement

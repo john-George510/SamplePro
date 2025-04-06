@@ -21,6 +21,33 @@ export const fetchUserBookings = createAsyncThunk(
         },
       };
       const { data } = await axios.get('/api/bookings/all', config);
+
+      const currentTime = new Date();
+      
+      // Update booking status based on expiration time if not assigned
+      data.forEach((booking) => {
+        if (booking.status !== 'Pending' || !booking.createdAt || !booking.expiration_time) {
+          return booking;
+        }
+        const expirationTime = new Date(booking.expiration_time);
+
+        const timeRemaining = expirationTime - currentTime;
+
+        const basePrice = booking.price - (booking.insurance_supported ? 500 : 0);
+
+        if (timeRemaining <= 0) {
+          booking.price = basePrice * 2 + (booking.insurance_supported ? 500 : 0); // Double the price if expired
+        } else if (timeRemaining <= 60 * 60 * 1000) { // Less than 1 hour remaining
+          booking.price = basePrice * 1.5 + (booking.insurance_supported ? 500 : 0); // Increase price by 50%
+        } else if (timeRemaining <= 6 * 60 * 60 * 1000) { // Less than 6 hours remaining
+          booking.price = basePrice * 1.3 + (booking.insurance_supported ? 500 : 0); // Increase price by 30%
+        } else if (timeRemaining <= 24 * 60 * 60 * 1000) { // Less than 24 hours remaining
+          booking.price = basePrice * 1.2 + (booking.insurance_supported ? 500 : 0); // Increase price by 20%
+        } else {
+          booking.price = basePrice + (booking.insurance_supported ? 500 : 0); // No increase
+        }
+      });
+
       return data;
     } catch (error) {
       return rejectWithValue(

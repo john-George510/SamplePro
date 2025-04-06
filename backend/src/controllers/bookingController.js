@@ -16,7 +16,7 @@ exports.createBooking = async (req, res) => {
       price_per_tonne,
       expected_amount,
       insurance_supported,
-      expiration_hours,
+      expiration_time,
       refrigeration_required,
       fragile
     } = req.body;
@@ -28,7 +28,7 @@ exports.createBooking = async (req, res) => {
 
     // Ensure source and destination exist and have correct structure
     if (!source || !destination ||
-        !lorry_type || !quantity || !material_type || !expiration_hours) {
+        !lorry_type || !quantity || !material_type || !expiration_time) {
       return res.status(400).json({ msg: 'Invalid input. Ensure all required fields are provided correctly.' });
     }
 
@@ -50,7 +50,7 @@ exports.createBooking = async (req, res) => {
       { latitude: destination.latitude, longitude: destination.longitude },
       lorry_type,
       material_type,
-      expiration_hours,
+      expiration_time,
       insurance_supported,
       quantity,
       refrigeration_required,
@@ -70,7 +70,7 @@ exports.createBooking = async (req, res) => {
       price_per_tonne,
       expected_amount,
       insurance_supported,
-      expiration_hours,
+      expiration_time,
       price,
       refrigeration_required,
       fragile
