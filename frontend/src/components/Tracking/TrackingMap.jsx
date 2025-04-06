@@ -17,7 +17,7 @@ const TrackingMap = ({ bookingId }) => {
   });
 
   useEffect(() => {
-    const socket = io("http://localhost:5000");
+    const socket = io(process.env.REACT_APP_BACKEND_API_URL);
 
     // Join room based on bookingId
     socket.emit('join', bookingId);

@@ -348,14 +348,29 @@ const BookingCard = ({
           {/* Price Display */}
           <div className="text-right">
             <div className="inline-block bg-green-50 px-4 py-2 rounded-lg border-2 border-green-100">
-              <p className="text-4xl font-bold text-green-600 tracking-tight">
-                ₹{booking.isCombinedRoute && booking.combinedPrice 
-                   ? booking.combinedPrice.toFixed(2) 
-                   : booking.price 
-                     ? booking.price.toFixed(2) 
-                     : '0.00'}
-              </p>
-              <p className="text-sm font-medium text-green-700">Total Fare</p>
+              {booking.status === 'Pending' ? (
+                <>
+                  <p className="text-4xl font-bold text-green-600 tracking-tight">
+                    ₹{booking.isCombinedRoute && booking.combinedPrice 
+                      ? (booking.combinedPrice * 0.9).toFixed(2) + ' - ' + (booking.combinedPrice * 1.1).toFixed(2)
+                      : booking.price 
+                        ? (booking.price * 0.9).toFixed(2) + ' - ' + (booking.price * 1.1).toFixed(2)
+                        : '0.00 - 0.00'}
+                  </p>
+                  <p className="text-sm font-medium text-green-700">Estimated Fare Range</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-4xl font-bold text-green-600 tracking-tight">
+                    ₹{booking.isCombinedRoute && booking.combinedPrice 
+                      ? booking.combinedPrice.toFixed(2) 
+                      : booking.price 
+                        ? booking.price.toFixed(2) 
+                        : '0.00'}
+                  </p>
+                  <p className="text-sm font-medium text-green-700">Total Fare</p>
+                </>
+              )}
             </div>
           </div>
 

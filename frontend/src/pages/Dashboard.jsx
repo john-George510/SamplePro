@@ -161,7 +161,7 @@ const Dashboard = () => {
         backgroundColor: 'var(--background)',
         minHeight: '100vh'
       }}>
-        <div className="dashboard-header" style={{
+        {/* <div className="dashboard-header" style={{
           background: 'white',
           padding: '24px',
           borderBottom: '1px solid var(--border)',
@@ -176,7 +176,7 @@ const Dashboard = () => {
           >
             Logout
           </button>
-        </div>
+        </div> */}
         <div className="p-4">
           {/* Booking Form Section */}
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6">

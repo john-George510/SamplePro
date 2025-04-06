@@ -72,6 +72,53 @@ const SuccessModal = ({ isOpen, onClose }) => {
   );
 };
 
+const reverseGeocode = async (latitude, longitude) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    const data = await response.json();
+    return data.address || {};
+  } catch (error) {
+    console.error('Reverse geocoding error:', error);
+    return {};
+  }
+};
+
+const getFuelPrice = async (state) => {
+  try {
+    console.log('Fetching fuel price for state:', state);
+    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.cardekho.com/fuel-price')}`)
+    console.log('Response status:', response);
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    
+    const html = await response.text();
+    // console.log('Fetched HTML:', html);
+
+    // presnt as json of {contents: '...'}
+    const jsonResponse = JSON.parse(html);
+    const content = jsonResponse.contents;
+    // console.log('Parsed HTML content:', content);
+    if (!content) throw new Error('No content found in the response');
+
+    const searchText = state.replace(' ','-').toLowerCase();
+
+    console.log('Searching for state:', searchText);
+    
+    const regex = new RegExp(
+        `<a href="https://www.cardekho.com/[^"]*-${searchText}-state"[^>]*>[^<]*</a></td><td>₹ ([0-9.]+)</td>`,
+        "i"
+    );
+    
+    const match = content.match(regex);
+    
+    return match ? `₹ ${match[1]}` : `Price not found for ${state}`;
+  } catch (error) {
+    console.error('Error fetching fuel price:', error);
+    return 'Fuel price data unavailable';
+  }
+};
+
 const BookingForm = () => {
   const dispatch = useDispatch();
 
@@ -79,6 +126,10 @@ const BookingForm = () => {
   const createStatus = useSelector((state) => state.bookings.createStatus);
   const bookingError = useSelector((state) => state.bookings.error);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [pickupLocationName, setPickupLocationName] = useState('');
+  const [dropoffLocationName, setDropoffLocationName] = useState('');
+  const [fuelPrice, setFuelPrice] = useState('Loading fuel price...');
+  const [fuelPriceState, setFuelPriceState] = useState('Your state');
 
   const initialState = {
     pickupLocation: null,
@@ -105,31 +156,74 @@ const BookingForm = () => {
     }));
   };
 
-  const handleLocationChange = (type, location) => {
+  const handleLocationChange = async (type, location) => {
     setFormData(prev => ({
       ...prev,
       [type]: location
     }));
+
+    // Get location name
+    try {
+      const address = await reverseGeocode(location.latitude, location.longitude);
+      const locationName = address.city || address.town || address.village || 
+                          address.county || address.state || 'Unknown location';
+      
+      if (type === 'pickupLocation') {
+        setPickupLocationName(locationName);
+
+        // Try to get fuel price if we have state info
+        if (address.state) {
+          setFuelPriceState(address.state);
+          const price = await getFuelPrice(address.state);
+          setFuelPrice(price);
+        }
+      } else {
+        setDropoffLocationName(locationName);
+      }
+    } catch (error) {
+      console.error('Error getting location name:', error);
+    }
   };
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
+          const location = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          
           setFormData((prev) => ({
             ...prev,
-            pickupLocation: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            },
+            pickupLocation: location,
           }));
+
+          // Get location name for pickup
+          try {
+            const address = await reverseGeocode(location.latitude, location.longitude);
+            const locationName = address.city || address.town || address.village || 
+                                address.county || address.state || 'Unknown location';
+            setPickupLocationName(locationName);
+
+            if (address.state) {
+              setFuelPriceState(address.state);
+              const price = await getFuelPrice(address.state);
+              setFuelPrice(price);
+            }
+          } catch (error) {
+            console.error('Error getting location name:', error);
+          }
         },
         (error) => {
           console.error('Error getting location:', error);
+          const defaultLocation = { latitude: 40.7128, longitude: -74.006 };
           setFormData((prev) => ({
             ...prev,
-            pickupLocation: { latitude: 40.7128, longitude: -74.006 },
+            pickupLocation: defaultLocation,
           }));
+          setPickupLocationName('New York');
+          setFuelPrice('₹ 96.76'); // Default NY fuel price
         }
       );
     }
@@ -162,11 +256,11 @@ const BookingForm = () => {
     }
 
     const bookingData = {
-      source: formData.pickupLocation,
+      source: pickupLocationName || 'Unknown location',
       source_latitude: formData.pickupLocation.latitude,
       source_longitude: formData.pickupLocation.longitude,
       company_name: formData.companyName,
-      destination: formData.dropoffLocation,
+      destination: dropoffLocationName || 'Unknown location',
       destination_latitude: formData.dropoffLocation.latitude,
       destination_longitude: formData.dropoffLocation.longitude,
       lorry_type: formData.lorryType,
@@ -199,12 +293,91 @@ const BookingForm = () => {
         margin: '0 auto',
         width: '100%'
       }}>
-        <h3>Create a Booking</h3>
+        <h3 
+          style={{
+            fontSize: '24px',
+            fontWeight: '600',
+            marginBottom: '20px',
+            color: 'var(--text)'
+          }} 
+        >Create a Booking</h3>
+        
+        <div style={{
+          margin: '24px 0',
+          padding: '20px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '12px',
+          borderLeft: '4px solid var(--primary)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          transition: 'all 0.3s ease',
+          ':hover': {
+            boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
+          }
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{
+              backgroundColor: 'var(--primary)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+            </div>
+            <div>
+              <h4 style={{
+                margin: 0,
+                fontSize: '16px',
+                fontWeight: '500',
+                color: 'var(--text-secondary)',
+                marginBottom: '4px'
+              }}>
+                {`Fuel Price in ${fuelPriceState}`}
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: '24px',
+                fontWeight: '600',
+                color: 'var(--primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                {fuelPrice}
+                <span style={{
+                  fontSize: '14px',
+                  fontWeight: '400',
+                  color: 'var(--text-secondary)',
+                  marginLeft: '4px'
+                }}>
+                  (per liter)
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+        
         <div className="form-group">
-          <h4>Pickup Location</h4>
+          <h4
+            style={{
+              marginBottom: '10px',
+              fontSize: '18px',
+              fontWeight: '500',
+              color: 'var(--text)'
+            }}
+          >Pickup Location {pickupLocationName && `(${pickupLocationName})`}</h4>
           {formData.pickupLocation ? (
             <MapPicker
-              label="Pickup Location"
+              label=""
               onSelectLocation={(location) => handleLocationChange('pickupLocation', location)}
               initialLocation={formData.pickupLocation}
             />
@@ -212,10 +385,17 @@ const BookingForm = () => {
             <p>Loading pickup location...</p>
           )}
         </div>
+        
         <div className="form-group">
-          <h4>Dropoff Location</h4>
+          <h4
+            style={{
+              marginBottom: '10px',
+              fontSize: '18px',
+              fontWeight: '500',
+              color: 'var(--text)'
+            }}>Dropoff Location {dropoffLocationName && `(${dropoffLocationName})`}</h4>
           <MapPicker
-            label="Dropoff Location"
+            label=""
             onSelectLocation={(location) => handleLocationChange('dropoffLocation', location)}
             initialLocation={formData.dropoffLocation}
           />

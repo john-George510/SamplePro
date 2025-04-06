@@ -7,7 +7,11 @@ exports.createBooking = async (req, res) => {
   try {
     const {
       source,
+      source_latitude,
+      source_longitude,
       destination,
+      destination_latitude,
+      destination_longitude,
       lorry_type,
       company_name,
       status,
@@ -34,20 +38,20 @@ exports.createBooking = async (req, res) => {
 
     const pickupLocation = { 
       type: 'Point',
-      coordinates: [source.longitude, source.latitude] 
+      coordinates: [source_longitude, source_latitude] 
     };
 
     const dropoffLocation = { 
       type: 'Point',
-      coordinates: [destination.longitude, destination.latitude] 
+      coordinates: [destination_longitude, destination_latitude] 
     };
 
     // console.log("Formatted Pickup Location:", pickupLocation);
     // console.log("Formatted Dropoff Location:", dropoffLocation);
 
     const { price, distance } = await pricingService.estimatePrice(
-      { latitude: source.latitude, longitude: source.longitude },
-      { latitude: destination.latitude, longitude: destination.longitude },
+      { latitude: source_latitude, longitude: source_longitude },
+      { latitude: destination_latitude, longitude: destination_longitude },
       lorry_type,
       material_type,
       expiration_time,

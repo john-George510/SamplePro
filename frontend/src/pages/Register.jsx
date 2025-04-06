@@ -1,7 +1,7 @@
 // Register.js
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../redux/slices/userSlice';
+import { register, login } from '../redux/slices/userSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import LogiFleetLogo from '../assets/LogiFLeet_logo.png';
 import '../App.css';
@@ -37,8 +37,9 @@ const Register = () => {
     e.preventDefault();
     try {
       const result = await dispatch(register({ name, email, password, role })).unwrap();
+      console.log('Registration successful:', result);
       if (result && result.token) {
-        navigate('/dashboard');
+        navigate('/login');
       }
     } catch (err) {
       // Error is handled by Redux and will be available in the error state

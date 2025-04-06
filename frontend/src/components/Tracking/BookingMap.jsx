@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 
 mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN'; // Replace with your token
 
-const socket = io('http://localhost:5000'); // Connect to backend server
+const socket = io(process.env.REACT_APP_BACKEND_API_URL); // Connect to backend server
 
 const BookingMap = ({ driverId }) => {
   const mapContainerRef = useRef(null);
