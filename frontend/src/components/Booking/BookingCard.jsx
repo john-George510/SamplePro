@@ -21,6 +21,8 @@ const BookingCard = ({
 }) => {
   const dispatch = useDispatch();
   const socket = useContext(SocketContext);
+  const isOnline = useSelector((state) => state.user.isOnline);
+  const role = useSelector((state) => state.user.role);
 
   const [isTracking, setIsTracking] = useState(false);
   const [pickupAddress, setPickupAddress] = useState('');
@@ -31,8 +33,6 @@ const BookingCard = ({
   const [distanceToPickup, setDistanceToPickup] = useState(null);
 
   const addressCache = useRef({}); // To cache addresses and reduce API calls
-
-  const role = useSelector((state) => state.user.role); // Access role from Redux
 
   // Function to perform reverse geocoding with caching
   const reverseGeocode = async (longitude, latitude) => {
@@ -286,28 +286,146 @@ const BookingCard = ({
       {onTrack && booking.driver && (
         <button className="track-button" onClick={handleTrack}>
           Track Driver
-        </button>
-      )}
-
-      {showAcceptButton && booking.status === 'Assigned' && (
-        <div className="status-buttons">
+  const renderActionButton = () => {
+    if (role === 'driver' && showAcceptButton && booking.status === 'Pending') {
+      if (!isOnline) {
+        return (
           <button
-            className="status-button"
-            onClick={() => handleStatusUpdate('On the way')}
+            className="w-full bg-gray-300 text-gray-600 font-semibold px-6 py-2.5 rounded-lg cursor-not-allowed"
+            disabled
           >
-            On the way
+            Go Online to Accept
+          </button>
+        );
+      }
+      return (
+        <button
+          onClick={handleAccept}
+          className="w-full bg-blue-600 text-white font-semibold px-6 py-2.5 rounded-lg
+          transition-all duration-200 ease-in-out
+          hover:bg-blue-700 hover:shadow-md
+          active:transform active:scale-95
+          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Accept Booking
+        </button>
+      );
+    }
+
+    if (booking.status === 'Assigned' && role === 'driver') {
+      return (
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => handleStatusUpdate('On the Way')}
+            className="bg-yellow-500 text-white font-semibold px-6 py-2.5 rounded-lg
+            transition-all duration-200 ease-in-out
+            hover:bg-yellow-600 hover:shadow-md
+            active:transform active:scale-95
+            focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+          >
+            On the Way
           </button>
           <button
-            className="status-button"
             onClick={() => handleStatusUpdate('Arrived')}
+            className="bg-green-500 text-white font-semibold px-6 py-2.5 rounded-lg
+            transition-all duration-200 ease-in-out
+            hover:bg-green-600 hover:shadow-md
+            active:transform active:scale-95
+            focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
           >
             Arrived
           </button>
         </div>
-      )}
+      );
+    }
 
+    return null;
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-lg p-6 mb-4 w-full border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Location Details */}
+        <div className="col-span-2 space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="absolute top-5 left-1.5 w-0.5 h-8 bg-gray-200"></div>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">PICKUP</p>
+                <p className="text-gray-800 font-medium">{pickupAddress}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">DROPOFF</p>
+                <p className="text-gray-800 font-medium">{dropoffAddress}</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Distance Information */}
+          <div className="flex items-center space-x-6 text-sm">
+            <div className="flex items-center space-x-2">
+              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+              <span className="text-gray-600 font-medium">
+                {distanceBetweenLocations} km
+              </span>
+            </div>
+            {role === 'driver' && distanceToPickup && (
+              <div className="flex items-center space-x-2">
+                <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                <span className="text-gray-600 font-medium">
+                  {distanceToPickup} km to pickup
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Price and Actions */}
+        <div className="flex flex-col justify-between border-l border-gray-100 pl-6">
+          {/* Price Display */}
+          <div className="text-right">
+            <div className="inline-block bg-green-50 px-4 py-2 rounded-lg border-2 border-green-100">
+              <p className="text-4xl font-bold text-green-600 tracking-tight">
+                ₹{parseFloat(booking.price).toFixed(2)}
+              </p>
+              <p className="text-sm font-medium text-green-700">Total Fare</p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-3 mt-4">
+            {renderActionButton()}
+          </div>
+        </div>
+      </div>
+
+      {/* Status Badge */}
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <div className={`
+          inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+          ${booking.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20' : ''}
+          ${booking.status === 'Assigned' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-600/20' : ''}
+          ${booking.status === 'On the Way' ? 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20' : ''}
+          ${booking.status === 'Arrived' ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20' : ''}
+          ${booking.status === 'Completed' ? 'bg-gray-50 text-gray-700 ring-1 ring-gray-600/20' : ''}
+        `}>
+          {booking.status}
+        </div>
+      </div>
+
+      {/* Track Modal */}
       {isTracking && (
-        <TrackModal bookingId={booking._id} onClose={handleCloseTrack} />
+        <TrackModal
+          booking={booking}
+          driverLocation={driverLocation}
+          onClose={handleCloseTrack}
+        />
       )}
 
       {/* Show potential route combinations for drivers */}

@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../redux/slices/userSlice';
-import { useNavigate } from 'react-router-dom';
-import '../App.css'; // Ensure this path is correct based on your project structure
+import { useNavigate, Link } from 'react-router-dom';
+import LogiFleetLogo from '../assets/LogiFLeet_logo.png';
+import '../App.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,24 +21,44 @@ const Login = () => {
 
   return (
     <div className="container">
-      <form onSubmit={handleSubmit}>
-        <h2>Login</h2>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
+      <div className="content-box" style={{ maxWidth: '400px' }}>
+        <h1 style={{ fontSize: '40px', fontWeight: '700' }}>Welcome Back!</h1>
+        <p className="subtitle">Sign in to your account</p>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+            Sign In
+          </button>
+        </form>
+
+        <p style={{ marginTop: '2rem', color: 'var(--text-secondary)' }}>
+          Don't have an account?{' '}
+          <Link to="/register" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: '500' }}>
+            Create Account
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

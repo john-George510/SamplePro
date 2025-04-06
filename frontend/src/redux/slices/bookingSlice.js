@@ -4,12 +4,13 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 axios.defaults.baseURL = "http://localhost:5000";
-// Fetch user bookings
-export const fetchUserBookings = createAsyncThunk(
+
+// Create thunks as constants first
+const fetchUserBookings = createAsyncThunk(
   'bookings/fetchUserBookings',
   async (_, { getState, rejectWithValue }) => {
     try {
-      const token = getState().user.token; // Correctly accessing token directly
+      const token = getState().user.token;
 
       if (!token) {
         throw new Error('No authentication token found. Please log in.');
@@ -59,12 +60,11 @@ export const fetchUserBookings = createAsyncThunk(
   }
 );
 
-// Accept a booking
-export const acceptBooking = createAsyncThunk(
+const acceptBooking = createAsyncThunk(
   'bookings/acceptBooking',
   async (bookingId, { getState, rejectWithValue }) => {
     try {
-      const token = getState().user.token; // Correctly accessing token directly
+      const token = getState().user.token;
       const user = getState().user;
       if (!token) {
         throw new Error('No authentication token found. Please log in.');
@@ -78,8 +78,8 @@ export const acceptBooking = createAsyncThunk(
 
       const { data } = await axios.put(`/api/bookings/${bookingId}/assign`, { 
         status: 'Assigned', 
-        driver: user.id // Ensure the driver ID is sent correctly 
-      }, config); // Empty body
+        driver: user.id
+      }, config);
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -91,12 +91,11 @@ export const acceptBooking = createAsyncThunk(
   }
 );
 
-// Fetch nearby bookings for driver
-export const fetchNearbyBookings = createAsyncThunk(
+const fetchNearbyBookings = createAsyncThunk(
   'bookings/fetchNearbyBookings',
   async ({ latitude, longitude }, { getState, rejectWithValue }) => {
     try {
-      const token = getState().user.token; // Correctly accessing token directly
+      const token = getState().user.token;
 
       if (!token) {
         throw new Error('No authentication token found. Please log in.');
@@ -123,12 +122,11 @@ export const fetchNearbyBookings = createAsyncThunk(
   }
 );
 
-// Create a new booking
-export const createBooking = createAsyncThunk(
+const createBooking = createAsyncThunk(
   'bookings/createBooking',
   async (bookingData, { getState, rejectWithValue }) => {
     try {
-      const token = getState().user.token; // Correctly accessing token directly
+      const token = getState().user.token;
 
       if (!token) {
         throw new Error('No authentication token found. Please log in.');
@@ -187,28 +185,29 @@ const bookingSlice = createSlice({
   initialState: {
     bookings: [],
     status: 'idle',
+    createStatus: 'idle',
     error: null,
   },
   reducers: {
-    // Add synchronous reducers here if needed
+    resetBookingStatus: (state) => {
+      state.status = 'idle';
+      state.createStatus = 'idle';
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
-      // Handle createBooking lifecycle
       .addCase(createBooking.pending, (state) => {
-        state.status = 'loading';
+        state.createStatus = 'loading';
       })
       .addCase(createBooking.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.bookings.unshift(action.payload); // Add the new booking to the top
+        state.createStatus = 'succeeded';
+        state.bookings.unshift(action.payload);
       })
       .addCase(createBooking.rejected, (state, action) => {
-        state.status = 'failed';
+        state.createStatus = 'failed';
         state.error = action.payload;
-      });
-
-    // Handle fetchUserBookings lifecycle
-    builder
+      })
       .addCase(fetchUserBookings.pending, (state) => {
         state.status = 'loading';
       })
@@ -219,10 +218,7 @@ const bookingSlice = createSlice({
       .addCase(fetchUserBookings.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
-      });
-
-    // Handle fetchNearbyBookings lifecycle
-    builder
+      })
       .addCase(fetchNearbyBookings.pending, (state) => {
         state.status = 'loading';
       })
@@ -233,16 +229,12 @@ const bookingSlice = createSlice({
       .addCase(fetchNearbyBookings.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
-      });
-
-    // Handle acceptBooking lifecycle
-    builder
+      })
       .addCase(acceptBooking.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(acceptBooking.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        // Update the specific booking in the bookings array
         const index = state.bookings.findIndex((booking) => booking._id === action.payload._id);
         if (index !== -1) {
           state.bookings[index] = action.payload;
@@ -255,8 +247,10 @@ const bookingSlice = createSlice({
   },
 });
 
-// Default export (reducer)
+// Export actions and thunks
+export const { resetBookingStatus } = bookingSlice.actions;
+export { fetchUserBookings, acceptBooking, fetchNearbyBookings, createBooking };
+
+// Export reducer
 export default bookingSlice.reducer;
 
-// Named exports (thunks)
-// export { fetchUserBookings, acceptBooking, fetchNearbyBookings, createBooking };
