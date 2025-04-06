@@ -218,74 +218,6 @@ const BookingCard = ({
     socket.emit('driverStatusUpdate', { bookingId: booking._id, status });
   };
 
-  return (
-    <div className="booking-card">
-      {/* Removed Booking ID Display */}
-
-      <p>
-        <strong>Company Name:</strong> {booking.company_name}
-      </p>
-
-      <p>
-        <strong>Pickup Location:</strong> {pickupAddress}
-      </p>
-      <p>
-        <strong>Dropoff Location:</strong> {dropoffAddress}
-      </p>
-      <p>
-        <strong>Vehicle Type:</strong> {booking.lorry_type}
-      </p>
-
-      {/* Display distance between Pickup and Dropoff for all roles */}
-      <p>
-        <strong>Distance Between Pickup and Dropoff:</strong>{' '}
-        {distanceBetweenLocations
-          ? `${distanceBetweenLocations} km`
-          : 'Calculating...'}
-      </p>
-
-      {/* Conditionally display distance from Driver to Pickup for Drivers only */}
-      {role === 'driver' && (
-        <p>
-          <strong>Distance to Pickup:</strong>{' '}
-          {distanceToPickup ? `${distanceToPickup} km` : 'Calculating...'}
-        </p>
-      )}
-
-      <p>
-        <strong>Price:</strong>{' '}
-        {booking.isCombinedRoute ? booking.combinedPrice ?`₹${booking.combinedPrice.toFixed(2)}` : 'N/A' : booking.price ? `₹${booking.price.toFixed(2)}` : 'N/A'}
-      </p>
-      <p>
-        <strong>Status:</strong> {booking.status}
-      </p>
-
-
-      {/* Combined */}
-      <p>
-        <strong>Combined Route:</strong>{' '}
-        {booking.isCombinedRoute ? 'Yes' : 'No'}
-      </p>
-
-      {/* Route Order */}
-      {booking.isCombinedRoute && 
-        <p>
-          <strong>Route Order:</strong>{' '}
-          <ol>
-            {locationAddress.map((address, index) => (
-              <li key={index}>{address}</li>
-            ))}
-          </ol>
-        </p>
-      }
-
-      {showAcceptButton && booking.status === 'Pending' && (
-        <button onClick={handleAccept}>Accept Booking</button>
-      )}
-
-      {onTrack && booking.driver && (
-        <button className="track-button" onClick={handleTrack}>
-          Track Driver
   const renderActionButton = () => {
     if (role === 'driver' && showAcceptButton && booking.status === 'Pending') {
       if (!isOnline) {
@@ -342,6 +274,17 @@ const BookingCard = ({
     return null;
   };
 
+  // Add validation for showing route combinations
+  const shouldShowRouteCombinations = () => {
+    return (
+      role === 'driver' && 
+      otherBookings && 
+      otherBookings.length > 0 && 
+      booking.status === 'Pending' && // Only show for pending bookings
+      !booking.isCombinedRoute // Don't show for already combined routes
+    );
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-4 w-full border border-gray-100 hover:shadow-xl transition-shadow duration-300">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -372,7 +315,9 @@ const BookingCard = ({
             <div className="flex items-center space-x-2">
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
               <span className="text-gray-600 font-medium">
-                {distanceBetweenLocations} km
+                {distanceBetweenLocations
+                  ? `${distanceBetweenLocations} km`
+                  : 'Calculating...'}
               </span>
             </div>
             {role === 'driver' && distanceToPickup && (
@@ -384,6 +329,18 @@ const BookingCard = ({
               </div>
             )}
           </div>
+
+          {/* Combined Route Information */}
+          {booking.isCombinedRoute && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+              <h4 className="text-blue-700 font-medium mb-2">Combined Route Details</h4>
+              <ol className="list-decimal pl-5 space-y-1">
+                {locationAddress.map((address, index) => (
+                  <li key={index} className="text-blue-600">{address}</li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
 
         {/* Price and Actions */}
@@ -392,7 +349,11 @@ const BookingCard = ({
           <div className="text-right">
             <div className="inline-block bg-green-50 px-4 py-2 rounded-lg border-2 border-green-100">
               <p className="text-4xl font-bold text-green-600 tracking-tight">
-                ₹{parseFloat(booking.price).toFixed(2)}
+                ₹{booking.isCombinedRoute && booking.combinedPrice 
+                   ? booking.combinedPrice.toFixed(2) 
+                   : booking.price 
+                     ? booking.price.toFixed(2) 
+                     : '0.00'}
               </p>
               <p className="text-sm font-medium text-green-700">Total Fare</p>
             </div>
@@ -401,6 +362,18 @@ const BookingCard = ({
           {/* Action Buttons */}
           <div className="space-y-3 mt-4">
             {renderActionButton()}
+            {onTrack && booking.driver && (
+              <button
+                onClick={handleTrack}
+                className="w-full bg-indigo-100 text-indigo-700 font-semibold px-6 py-2.5 rounded-lg
+                transition-all duration-200 ease-in-out
+                hover:bg-indigo-200
+                active:transform active:scale-95
+                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                Track Driver
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -428,18 +401,20 @@ const BookingCard = ({
         />
       )}
 
-      {/* Show potential route combinations for drivers */}
-      {role === 'driver' && otherBookings.length > 0 && (
-        <div className="route-combinations">
-          <h4>Potential Route Combinations</h4>
-          {otherBookings.map((otherBooking) => (
-            <RouteCombinationCard
-              key={otherBooking._id}
-              booking1={booking}
-              booking2={otherBooking}
-              onCombine={onCombineRoutes}
-            />
-          ))}
+      {/* Route Combinations - Updated with validation */}
+      {shouldShowRouteCombinations() && (
+        <div className="mt-6 pt-4 border-t border-gray-100">
+          <h4 className="text-lg font-semibold mb-4">Potential Route Combinations</h4>
+          <div className="space-y-4">
+            {otherBookings.map((otherBooking) => (
+              <RouteCombinationCard
+                key={otherBooking._id}
+                booking1={booking}
+                booking2={otherBooking}
+                onCombine={onCombineRoutes}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
