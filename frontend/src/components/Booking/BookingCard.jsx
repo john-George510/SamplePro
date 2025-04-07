@@ -10,6 +10,7 @@ import RouteCombinationCard from './RouteCombinationCard';
 
 // Ensure Mapbox CSS is imported
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { calculateRouteDistance } from '../../utils/routeUtils';
 
 const BookingCard = ({
   booking,
@@ -75,6 +76,13 @@ const BookingCard = ({
       }
 
       console.log(booking.routeOrder);
+      // await calculateRouteDistance([
+      //   [lon1, lat1], // Pickup coordinates
+      //   [lon2, lat2], // Dropoff coordinates
+      // ]).then((distance) => {
+      //   console.log('Distance:', distance);
+      //   setDistanceBetweenLocations(distance); // Set the distance between locations
+      // })
       if (booking.routeOrder && booking.routeOrder.length > 0) {
         const addresses = await Promise.all(
           booking.routeOrder.map(async (stop) => {
@@ -88,6 +96,8 @@ const BookingCard = ({
         );
         console.log(addresses);
         setLocationAddress(addresses);
+
+        
       }
 
     };
@@ -111,12 +121,12 @@ const BookingCard = ({
   };
 
   // Debounced distance calculation between Pickup and Dropoff
-  const debouncedCalculateDistanceBetween = useRef(
-    debounce((lat1, lon1, lat2, lon2) => {
-      const distance = calculateDistance(lat1, lon1, lat2, lon2);
-      setDistanceBetweenLocations(distance);
-    }, 500)
-  ).current;
+  // const debouncedCalculateDistanceBetween = useRef(
+  //   debounce((lat1, lon1, lat2, lon2) => {
+  //     const distance = calculateDistance(lat1, lon1, lat2, lon2);
+  //     setDistanceBetweenLocations(distance);
+  //   }, 500)
+  // ).current;
 
   // Debounced distance calculation from Driver to Pickup
   const debouncedCalculateDistanceToPickup = useRef(
@@ -151,15 +161,20 @@ const BookingCard = ({
         return;
       }
 
-      const distance = calculateDistance(
-        pickupLatitude,
-        pickupLongitude,
-        dropoffLatitude,
-        dropoffLongitude
-      );
-      setDistanceBetweenLocations(distance);
+      const fetchDistance = async () => {
+
+        const distance = await calculateRouteDistance([
+          [pickupLongitude, pickupLatitude], // Pickup coordinates
+          [dropoffLongitude, dropoffLatitude], // Dropoff coordinates
+        ]).then((distance) => {
+          console.log('Distance:', distance);
+          setDistanceBetweenLocations(distance.toFixed(2)); // Set the distance between locations
+        })
+      }
+      fetchDistance();
+      // setDistanceBetweenLocations(distance);
     }
-  }, [booking, debouncedCalculateDistanceBetween]);
+  }, [booking]);
 
   // Calculate distance from Driver to Pickup (only for Drivers)
   useEffect(() => {
@@ -417,7 +432,7 @@ const BookingCard = ({
       )}
 
       {/* Route Combinations - Updated with validation */}
-      {shouldShowRouteCombinations() && (
+      {shouldShowRouteCombinations() &&  (
         <div className="mt-6 pt-4 border-t border-gray-100">
           <h4 className="text-lg font-semibold mb-4">Potential Route Combinations</h4>
           <div className="space-y-4">

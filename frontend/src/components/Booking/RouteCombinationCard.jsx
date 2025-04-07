@@ -133,43 +133,90 @@ const RouteCombinationCard = ({ booking1, booking2 }) => {
   };
 
   return (
-    <div className="route-combination-card">
-      {/* <h4>Potential Route Combination</h4> */}
-      <div className="route-details">
-        <p>
-          <strong>Company Name: </strong> {booking2.company_name}
-        </p>
-        <p>
-          <strong>Main Route Distance:</strong> {mainRouteDistance.toFixed(2)} km
-        </p>
-        <p>
-          <strong>Combined Distance:</strong> {distance} km
-        </p>
-        <p>
-          <strong>Total Price:</strong> ₹{totalPrice.toFixed(2)}
-        </p>
-        <p>
-          <strong>Potential Savings:</strong> ₹{savings.toFixed(2)}
-        </p>
+    <div style={{
+      border: '1px solid #e0e0e0',
+      borderRadius: '8px',
+      padding: '16px',
+      margin: '16px 0',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      backgroundColor: '#fff'
+    }}>
+      <div style={{ marginBottom: '16px' }}>
+        <div style={{ 
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: '12px',
+          marginBottom: '16px'
+        }}>
+          <div>
+            <p style={{ margin: '4px 0', fontWeight: '500' }}>Company Name:</p>
+            <p style={{ margin: '4px 0' }}>{booking2.company_name}</p>
+          </div>
+          <div>
+            <p style={{ margin: '4px 0', fontWeight: '500' }}>Main Route Distance:</p>
+            <p style={{ margin: '4px 0' }}>{mainRouteDistance.toFixed(2)} km</p>
+          </div>
+          <div>
+            <p style={{ margin: '4px 0', fontWeight: '500' }}>Combined Distance:</p>
+            <p style={{ margin: '4px 0' }}>{distance.toFixed(2)} km</p>
+          </div>
+          <div>
+            <p style={{ margin: '4px 0', fontWeight: '500' }}>Total Price:</p>
+            <p style={{ margin: '4px 0' }}>₹{totalPrice.toFixed(2)}</p>
+          </div>
+          <div>
+            <p style={{ margin: '4px 0', fontWeight: '500' }}>Potential Savings:</p>
+            <p style={{ 
+              margin: '4px 0', 
+              color: savings > 0 ? '#2e7d32' : '#d32f2f',
+              fontWeight: '600'
+            }}>
+              ₹{savings.toFixed(2)}
+            </p>
+          </div>
+        </div>
+        
+        <div style={{ marginTop: '16px' }}>
+          <h5 style={{ 
+            margin: '0 0 8px 0',
+            fontSize: '16px',
+            fontWeight: '600'
+          }}>
+            Suggested Route Order:
+          </h5>
+          <ol style={{ 
+            margin: '0',
+            paddingLeft: '20px',
+            listStyleType: 'decimal'
+          }}>
+            {order?.map((stop, index) => (
+              <li key={index} style={{ marginBottom: '4px' }}>
+                {getLocationName(stop)}
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
-      <div className="route-order">
-        <h5>Suggested Route Order:</h5>
-        <ol>
-          {order?.map((stop, index) => (
-            <li key={index}>
-              {getLocationName(stop)}
-            </li>
-          ))}
-        </ol>
-      </div>
+      
       <button
-        className="combine-button"
+        style={{
+          width: '100%',
+          padding: '10px 16px',
+          backgroundColor: '#1976d2',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          transition: 'background-color 0.2s',
+          marginTop: '12px'
+        }}
+        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1565c0'}
+        onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1976d2'}
         onClick={handleCombine}
-        // disabled={combiningBookings}
       >
-        {'Combine Routes'}
+        Combine Routes
       </button>
-      {/* {combineError && <div className="error-message">{combineError}</div>} */}
     </div>
   );
 };
